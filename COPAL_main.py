@@ -116,7 +116,7 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
     multiple_alignment = msa_warp.multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict)
     final_alignment = multiple_alignment[0]
     multiple_alignment_order = multiple_alignment[1]
-    final_align_length = len(final_alignment[final_alignment.keys()[0]])
+    final_align_length = len(next(iter(final_alignment.values())))
     samplenum = len(samplelengths)
     align_lengths = [final_align_length] * samplenum    # required as input for some functions, in order for the functions to also be able to handle varying sample lengths
 

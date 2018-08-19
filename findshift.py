@@ -51,8 +51,8 @@ def get_headers(samplenum):
     Keyword argument: samplenum -- number of samples
     Returns headers -- list of pairwise combinations of sample numbers in '1:2' format  
     """
-    samples = range(1, samplenum+1)[:-1]
-    targets = range(1, samplenum+1)[1:]
+    samples = list(range(1, samplenum+1)[:-1])
+    targets = list(range(1, samplenum+1)[1:])
     headers = []
     for sample in samples:
         for target in targets:

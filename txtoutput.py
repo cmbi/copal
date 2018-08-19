@@ -32,8 +32,7 @@ def show_gap(alignment):
             line.append('_')
     strline = "".join(line)
     return strline
-
-                                
+              
 def show_align(alignment, file):
     """
     outputs string visualisation of gap locations of given alignment
@@ -45,11 +44,9 @@ def show_align(alignment, file):
         file: file object of output text file with align info
     Returns None
     """
-    samplekeys = alignment.keys()
-    samplekeys.sort()
+    samplekeys = sorted(alignment.keys())
     for key in samplekeys:
         put("sample {:4s}: ".format(key) + str(show_gap(alignment[key])), file)
-
 
 def put(string, file):
     """
@@ -62,7 +59,6 @@ def put(string, file):
     """
     print(string)
     file.write(string+ "\n")
-
 
 def create_ranked_file(rnk_filename, dataframe, columns):
     #dataframe['Fasta headers'] = dataframe.index.values
@@ -126,8 +122,7 @@ def text_output(input, output, align_info, output_path):
         put("%d  %s"%(i+1,input['samplenames'][i]), txtfile)
 
     # clustering info
-    paircostkeys = output['pairwisecosts'].keys()
-    paircostkeys.sort()
+    paircostkeys = sorted(output['pairwisecosts'].keys())
     put("\npairwise clustering results (from low to high cost):", txtfile)
     for key in paircostkeys:
         put("pair: " + str(output['pairwisecosts'][key]) + "   cost: " + str(key), txtfile) 
