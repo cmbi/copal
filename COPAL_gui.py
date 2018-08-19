@@ -171,7 +171,7 @@ def check_output():
         if error: set message in status label, return false
         if no error: return True
     """
-    print input['samplenames']
+    print(input['samplenames'])
     if job_name.get() == '':
         status_var.set("no job name entered!")
         return False
@@ -211,25 +211,25 @@ def check_output():
             
 def print_input():
     """prints out global input variables to stdout"""
-    print "file name: ", input['filename']
-    print "file type: ", input['input_type']
-    print "skiprows: ", input['skiprows']
-    print "identifier: ", input['identifier']
-    print "sheetname : ", input['sheetname']
-    print "sample columns: ", input['samplecolumns']
-    print "sample names: ", input['samplenames']
+    print("file name: ", input['filename'])
+    print("file type: ", input['input_type'])
+    print("skiprows: ", input['skiprows'])
+    print("identifier: ", input['identifier'])
+    print("sheetname : ", input['sheetname'])
+    print("sample columns: ", input['samplecolumns'])
+    print("sample names: ", input['samplenames'])
 
 def print_output():
     """prints out global output variables to stdout"""
-    print "job name: ", input['analysis_name']
-    print "norm_check: ", input['norm_check']
-    print "normcol: ", input['normcol']
-    print "normfile: ", input['normfile']
-    print "score analysis: ", input['hausdorff_scoring']
-    print "hausdorff factor: ", input['hausd_factor']
-    print "gsea output: ", input['gsea_output']
-    print "gsea column: ", input['GSEA_rank_column']
-    print "groups: ", input['groups']
+    print("job name: ", input['analysis_name'])
+    print("norm_check: ", input['norm_check'])
+    print("normcol: ", input['normcol'])
+    print("normfile: ", input['normfile'])
+    print("score analysis: ", input['hausdorff_scoring'])
+    print("hausdorff factor: ", input['hausd_factor'])
+    print("gsea output: ", input['gsea_output'])
+    print("gsea column: ", input['GSEA_rank_column'])
+    print("groups: ", input['groups'])
 
 def run_analysis():
     """
@@ -243,8 +243,8 @@ def run_analysis():
         status_var.set("analysis complete! your output is in: " + output_folder.get() + "/" + input['analysis_name'] + "_results")  
     except Exception as e:
         status_var.set("Error occured. Check and re-enter input.  " + str(e))
-        print "something went wrong! please check and re-enter your input"
-        print "error message: ", e
+        print("something went wrong! please check and re-enter your input")
+        print("error message: ", e)
     save_settings_button.bind("<Button-1>", save_output_and_run_handler) 
 
 # ---------- EVENT HANDLERS ---------- #

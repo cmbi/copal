@@ -34,7 +34,7 @@ def input_processing(input):
     samplenum = len(input['samplenames'])
 
     #LOAD DATA FROM EXCEL
-    print "loading data from input files..."
+    print( "loading data from input files...")
     dataframes = []
     for i in range(len(input['filename'])):
         dataframes.append(dataprep.multi_dataload(input['identifier'][i],
@@ -46,7 +46,7 @@ def input_processing(input):
                           
     #IF NESCESSARY: ADD NORMALISATION COLUMN
     if input['normfile'] != None:          # check if normlist value is not None.
-        print "loading normalisation IDs from file..."  
+        print( "loading normalisation IDs from file..."  )
         new_dataframes = []            # use normlist variable to add normcolumn to dfs
         for i in range(len(dataframes)):
             new_dataframes.append(dataprep.get_norm_data(input['normfile'],
@@ -65,13 +65,13 @@ def input_processing(input):
     modifieddata = prepareddata[2]
     mod_factors = prepareddata[3]
     original_frame_lengths = []
-    print "length of original dataframes:"
+    print( "length of original dataframes:")
     for i in dataframes:
-        print len(i.index.values)
+        print( len(i.index.values))
         original_frame_lengths.append(len(i.index.values))
-    print "length of matched dataframes:"
+    print( "length of matched dataframes:")
     for i in matcheddataframes:
-        print len(i.index.values)
+        print( len(i.index.values))
     return (matcheddataframes, samplelengths, modifieddata, mod_factors, original_frame_lengths) 
 
 
@@ -99,12 +99,12 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
                           -- format: {'sample1:sample2':cost(type:float)}
     """
     # CALCULATE LOCAL DISTANCE GRIDS FOR ALL PAIRWISE ALIGNMENTS
-    print "calculating local distances..."
+    print( "calculating local distances...")
     localdict = localdist.pairwise_localdist(modifieddata)
     #print localdict.keys()
 
     # PERFORM PAIRWISE ALIGNMENTS
-    print "performing pairwise alignments..."
+    print( "performing pairwise alignments...")
     # iterate through all pairwise combinations of samples
     pairwise_warp = msa_warp.pairwise_timewarp(modifieddata,samplelengths,localdict)
     pairwisedict = pairwise_warp[0]
@@ -112,7 +112,7 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
     paircostkeys = pairwisecosts.keys()
     
     # DETERMINE ALINGMENT ORDER FOR MSA, PERFORM ALIGNMENTS
-    print "performing multiple alignments..."   
+    print( "performing multiple alignments..."   )
     multiple_alignment = msa_warp.multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict)
     final_alignment = multiple_alignment[0]
     multiple_alignment_order = multiple_alignment[1]
@@ -121,7 +121,7 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
     align_lengths = [final_align_length] * samplenum    # required as input for some functions, in order for the functions to also be able to handle varying sample lengths
 
     # WARP DATA USING FINAL ALIGNMENT
-    print "warping data using final multiple alignment..."
+    print( "warping data using final multiple alignment...")
     warpeddata = msa_warp.datawarp(modifieddata, final_alignment)
     #transform warped data to pandas dataframe
     warpeddataframe = datatoexcel.datatoframe(warpeddata, input['samplenames'], align_lengths)
@@ -201,18 +201,18 @@ def output_results(input, output):
     os.chdir(output_path)
 
     # CSV OUTPUT OF DATAFRAMES (FOR POST-ANALYSIS)
-    print "exporting data to csv..."
+    print( "exporting data to csv...")
     if input['hausdorff_scoring']:
         output['score_frame'].to_csv(csv_score_frame)
     output['newdataframe'].to_csv(csv_dataframe)
 
     # EXCEL OUTPUT OF DATAFRAMES, GRAPHS OF PROTEINS
-    print "exporting data to excel..."
+    print( "exporting data to excel...")
     datatoexcel.exceldump(output['newdataframe'], excel_output, align_lengths, input['samplenames'], output['score_frame'], output['dataloc'])
 
     # .RNK OUTPUT FOR GENE SET ENRICHMENT ANALYSIS
     if input['hausdorff_scoring'] and input['gsea_output']:
-        print "generating .rnk files..."
+        print( "generating .rnk files...")
         # add identifier column for .rnk file to score frame
         rank_ident = output['newdataframe'][input['GSEA_rank_column']]
         rank_frame = pd.concat([output['score_frame'], rank_ident], axis = 1)

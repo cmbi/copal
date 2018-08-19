@@ -60,7 +60,7 @@ def put(string, file):
         file: file object to write to
     Returns None
     """
-    print string
+    print(string)
     file.write(string+ "\n")
 
 
@@ -69,8 +69,8 @@ def create_ranked_file(rnk_filename, dataframe, columns):
     newframe = pd.concat([dataframe[columns[0]], dataframe[columns[1]]], axis = 1)
     newframe.dropna(inplace = True)
     np.savetxt(rnk_filename, newframe.values, fmt = '%s', delimiter = ' ')
-    print "outputfile: ", rnk_filename
-    print "outputfile length: ", len(newframe.index.values)
+    print("outputfile: ", rnk_filename)
+    print("outputfile length: ", len(newframe.index.values))
         
 def text_output(input, output, align_info, output_path):
     """
@@ -94,7 +94,7 @@ def text_output(input, output, align_info, output_path):
     """     
     
     txtfile = open(align_info, 'w')
-    print "-" * 60
+    print("-" * 60)
     put("ALIGNMENT INFO\n", txtfile)
     put("source file(s): " + str(input['filename']), txtfile)
     
@@ -152,5 +152,5 @@ def text_output(input, output, align_info, output_path):
     # close file and return to starting directory after storing file in results folder
     txtfile.close()
     os.chdir('..')
-    print "Complexome profile alignment Complete! Your output can be found in: ", output_path
+    print("Complexome profile alignment Complete! Your output can be found in: ", output_path)
     

@@ -90,7 +90,7 @@ def multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict):
             msa_order.append(((int(pair.split(':')[0])),(int(pair.split(':')[1])), key))                 # add alignment info to msa_order
        
         elif sample_in_alignments[0] == sample_in_alignments[1]:           # samples already in same alignment --> skip this pair
-            pass  # skip deze alignment
+            pass  # skip this alignment
        
         elif sample_in_alignments[0] != None and sample_in_alignments[1] != None:    # samples are in different alignments --> align these  
             align1key = alignments.keys()[sample_in_alignments[0]]                   # get keys from the 2 alignments
