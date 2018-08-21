@@ -503,9 +503,9 @@ def output_options_frame(master):
     # score analysis group text boxes
     group1_label = tk.Label(master, text = "group 1 samples").grid(row = 6, column = 1)
     group2_label = tk.Label(master, text = "group 2 samples").grid(row = 6, column = 2)
-    group1_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE)
+    group1_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE,cursor = 'arrow')
     group1_text.grid(column = 1)
-    group2_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE)
+    group2_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE,cursor='arrow')
     group2_text.grid(row = 7, column = 2)
     
     # hausdorff factor label and entry
