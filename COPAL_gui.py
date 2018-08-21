@@ -7,8 +7,9 @@ Copyright (C) 2018  Radboud universitair medisch centrum
 """
 
 # import statements
-import Tkinter as tk
-import tkFileDialog
+import tkinter as tk
+from tkinter import filedialog
+#import filedialog
 import COPAL_main
 import os
 import threading
@@ -264,7 +265,7 @@ def get_file(event = None):
     
     assigns path/filename to global file_name variable
     """
-    file_name.set(tkFileDialog.askopenfilename(title = 'Choose a file'))
+    file_name.set(filedialog.askopenfilename(title = 'Choose a file'))
 
 def get_norm_file(event = None):
     """
@@ -272,7 +273,7 @@ def get_norm_file(event = None):
     
     assigns path/gilename to global file_name variable
     """
-    norm_file.set(tkFileDialog.askopenfilename(title = 'Choose a file'))
+    norm_file.set(filedialog.askopenfilename(title = 'Choose a file'))
 
 def get_output_folder(event = None):
     """
@@ -280,7 +281,7 @@ def get_output_folder(event = None):
     
     stores path to stringvar variable output_folder
     """
-    output_folder.set(tkFileDialog.askdirectory(title = 'Choose folder'))
+    output_folder.set(filedialog.askdirectory(title = 'Choose folder'))
 
 def save_proceed_handler(event = None):
     """
@@ -404,15 +405,15 @@ def input_frame(master):
 
     # sample names label and text box
     sample_names_label = tk.Label(master, text = "sample names").grid(row = 3, column = 0, columnspan = 2, pady = 5)
-    sample_names_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE)
+    sample_names_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE,cursor='arrow')
     sample_names_box.grid(row = 4, column = 0, columnspan = 2, padx = 10)
 
     # sample columns labels and text boxes
     sample_columns_label = tk.Label(master, text = "first column").grid(row = 3, column = 2)
-    sample_columns_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE)
+    sample_columns_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE, cursor='arrow')
     sample_columns_box.grid(row = 4, column = 2)
     sample_columns_second_label = tk.Label(master, text = "last column").grid(row = 3, column = 3)
-    sample_columns_second_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE)
+    sample_columns_second_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE, cursor='arrow')
     sample_columns_second_box.grid(row = 4, column = 3)
     
     # quit application button
