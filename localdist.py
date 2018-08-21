@@ -12,7 +12,7 @@ def gridprint(grid):
     """prints a grid, for debugging purposes"""
     row = 1
     for i in grid:
-        print i
+        print(i)
         row += 1
 
 def distcalc(series1, series2):
@@ -27,7 +27,7 @@ def distcalc(series1, series2):
         distance between samples at certain slice
     """
     dist = 0
-    for first, second in itertools.izip(series1, series2):          # iterates trough both lists in paralel
+    for first, second in zip(series1, series2):          # iterates trough both lists in paralel
         dist += abs(first - second)                                 # calculates absolute distance between corresponding values from 2 lists
     return dist    
 
@@ -68,8 +68,8 @@ def pairwise_localdist(data):
                    - values 2D list structure
     """
     localdict = {}
-    samples = range(1,len(data)+1)             # the samples the main loop iterates through
-    targets = range(1,len(data)+1)             # the target samples that get aligned with samples
+    samples = list(range(1,len(data)+1))             # the samples the main loop iterates through
+    targets = list(range(1,len(data)+1))             # the target samples that get aligned with samples
     for sample in samples:                     #loops through each sample
         for target in targets:                 # per sample, loops through all targets
             localdict[str(sample) + ":" + str(target)] = localdist(data[sample-1], data[target-1])

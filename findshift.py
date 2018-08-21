@@ -51,8 +51,8 @@ def get_headers(samplenum):
     Keyword argument: samplenum -- number of samples
     Returns headers -- list of pairwise combinations of sample numbers in '1:2' format  
     """
-    samples = range(1, samplenum+1)[:-1]
-    targets = range(1, samplenum+1)[1:]
+    samples = list(range(1, samplenum+1)[:-1])
+    targets = list(range(1, samplenum+1)[1:])
     headers = []
     for sample in samples:
         for target in targets:
@@ -99,12 +99,12 @@ def find_hausdorff(dataframe, samplelengths, mainframe, alignment, groups, normc
                                                 sample groups.
                                                (group2_intensity/group1_intensity)
     """
-    print "determining hausdorff distances..."
+    print("determining hausdorff distances...")
     distdata = []
     intensity_diffs = []
     counter = 1
     for row in dataframe.itertuples():                     
-        print "starting on new protein: #", counter
+        print("starting on new protein: #", counter)
         index = row[0]                                             
         data = list(row)[1:]
         slices = slicer(data, samplelengths)   # slice rows into seperate series per sample

@@ -32,8 +32,7 @@ def show_gap(alignment):
             line.append('_')
     strline = "".join(line)
     return strline
-
-                                
+              
 def show_align(alignment, file):
     """
     outputs string visualisation of gap locations of given alignment
@@ -45,11 +44,9 @@ def show_align(alignment, file):
         file: file object of output text file with align info
     Returns None
     """
-    samplekeys = alignment.keys()
-    samplekeys.sort()
+    samplekeys = sorted(alignment.keys())
     for key in samplekeys:
         put("sample {:4s}: ".format(key) + str(show_gap(alignment[key])), file)
-
 
 def put(string, file):
     """
@@ -60,17 +57,16 @@ def put(string, file):
         file: file object to write to
     Returns None
     """
-    print string
+    print(string)
     file.write(string+ "\n")
-
 
 def create_ranked_file(rnk_filename, dataframe, columns):
     #dataframe['Fasta headers'] = dataframe.index.values
     newframe = pd.concat([dataframe[columns[0]], dataframe[columns[1]]], axis = 1)
     newframe.dropna(inplace = True)
     np.savetxt(rnk_filename, newframe.values, fmt = '%s', delimiter = ' ')
-    print "outputfile: ", rnk_filename
-    print "outputfile length: ", len(newframe.index.values)
+    print("outputfile: ", rnk_filename)
+    print("outputfile length: ", len(newframe.index.values))
         
 def text_output(input, output, align_info, output_path):
     """
@@ -94,7 +90,7 @@ def text_output(input, output, align_info, output_path):
     """     
     
     txtfile = open(align_info, 'w')
-    print "-" * 60
+    print("-" * 60)
     put("ALIGNMENT INFO\n", txtfile)
     put("source file(s): " + str(input['filename']), txtfile)
     
@@ -126,8 +122,7 @@ def text_output(input, output, align_info, output_path):
         put("%d  %s"%(i+1,input['samplenames'][i]), txtfile)
 
     # clustering info
-    paircostkeys = output['pairwisecosts'].keys()
-    paircostkeys.sort()
+    paircostkeys = sorted(output['pairwisecosts'].keys())
     put("\npairwise clustering results (from low to high cost):", txtfile)
     for key in paircostkeys:
         put("pair: " + str(output['pairwisecosts'][key]) + "   cost: " + str(key), txtfile) 
@@ -152,5 +147,5 @@ def text_output(input, output, align_info, output_path):
     # close file and return to starting directory after storing file in results folder
     txtfile.close()
     os.chdir('..')
-    print "Complexome profile alignment Complete! Your output can be found in: ", output_path
+    print("Complexome profile alignment Complete! Your output can be found in: ", output_path)
     

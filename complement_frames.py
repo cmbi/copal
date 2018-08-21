@@ -27,7 +27,7 @@ def complement_dataframes(dataframes, normcol, gseacol, samplecolumns):
         list of complemented pandas dataframes
     """
     if len(dataframes) > 1:
-        print "complementing samples that are missing proteins..."
+        print( "complementing samples that are missing proteins...")
         matcheddataframes = []
         datamatches = dataframes[1:]
         target_frame = dataframes[0]
@@ -114,6 +114,6 @@ def match_two_frames(target_frame, match_frame, identcolumns, target_samplecolum
         new_row = pd.Series(protein_data, index = protein_indexes, name = protein)
         # add series to target_frame as a new row
         target_frame = target_frame.append(new_row)
-    print "length target_frame: ", len(target_frame)
+    print( "length target_frame: ", len(target_frame))
         
     return target_frame

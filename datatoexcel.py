@@ -115,7 +115,7 @@ def exceldump(dataframe, filename, samplelengths, sample_names, shift_frame, dat
         shift_frame.to_excel(writer, sheet_name = 'scores')
         
         #add graphs to excel file if score analysis was performed
-        print "adding graphs..."
+        print("adding graphs...")
         graphsheet = workbook.add_worksheet('graphs')
         dumprow = 1              #row in which graph gets placed
         count = 1                                           

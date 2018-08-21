@@ -49,8 +49,8 @@ def timewarp(localdict,align1,align2):
     # perform backtrace
     # warp starting series, store in new alignment dictionary 
     
-    al1len = len(align1[align1.keys()[0]])                   # length of alignments
-    al2len = len(align2[align2.keys()[0]])
+    al1len = len(align1[next(iter(align1.keys()))])                   # length of alignments
+    al2len = len(align2[next(iter(align2.keys()))])
 
     # initialise data structures. 2 grids, one with distance cost values, one with arrows for backtracing.
     distcost = []

@@ -79,22 +79,22 @@ def multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict):
         sample_in_alignments = []       # shows for both samples in pair whether and if so, in which alignment it is using None/slicenr of alignments list
         for sample in [0,1]:            # loops through 2 samples in each pair
             sample_loc = None
-            for i in range(len(alignments.keys())):   #for each alignment, checks whether sample is included in it. if so, stores location in sample_loc
-                if int(pair.split(':')[sample]) in alignments.keys()[i]:
-                    sample_loc = i
+            for al_key in alignments.keys():   #for each alignment, checks whether sample is included in it. if so, stores location in sample_loc
+                if int(pair.split(':')[sample]) in al_key:
+                    sample_loc = al_key
             sample_in_alignments.append(sample_loc)     # for each sample, appends sample_value to sample_in_alignments
-                
+
     #perform time warping alignment for all possible scenarios of each pair 
         if sample_in_alignments[0] == None and sample_in_alignments[1] == None:  # both samples haven't been aligned --> take pairwise alignment 
             alignments[(int(pair.split(':')[0]),int(pair.split(':')[1]))] = pairwisedict[pair]       # get alignment from pairwisedict, store in alignments
             msa_order.append(((int(pair.split(':')[0])),(int(pair.split(':')[1])), key))                 # add alignment info to msa_order
        
         elif sample_in_alignments[0] == sample_in_alignments[1]:           # samples already in same alignment --> skip this pair
-            pass  # skip deze alignment
+            pass  # skip this alignment
        
         elif sample_in_alignments[0] != None and sample_in_alignments[1] != None:    # samples are in different alignments --> align these  
-            align1key = alignments.keys()[sample_in_alignments[0]]                   # get keys from the 2 alignments
-            align2key = alignments.keys()[sample_in_alignments[1]]
+            align1key = sample_in_alignments[0]                   # get keys from the 2 alignments
+            align2key = sample_in_alignments[1]
             new_key = tuple(list(align1key)+list(align2key))                         # create new key by combining old ones
             alignments[new_key] = timewarp.timewarp(localdict,alignments[align1key], alignments[align2key])[0]   # perform alignment, store in alignments
             msa_order.append((align1key,align2key, key))
@@ -103,7 +103,7 @@ def multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict):
        
         elif sample_in_alignments[0] == None:                             #sample 1 not yet aligned, 2 has been --> align 1 with 2's alignment
             new_align = {pair.split(':')[0]:range(samplelengths[int(pair.split(':')[0])-1])}       # create new entry for unaligned sample
-            align2key = alignments.keys()[sample_in_alignments[1]]        # get key for 2's alignment
+            align2key = sample_in_alignments[1]        # get key for 2's alignment
             new_key = tuple(list(align2key) + [int(pair.split(':')[0])])             # generate new key by adding sample 1
             alignments[new_key] = timewarp.timewarp(localdict,new_align,alignments[align2key])[0]
             msa_order.append(((int(pair[0])), align2key, key))
@@ -111,13 +111,13 @@ def multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict):
        
         elif sample_in_alignments[1] == None:                             # sample 2 not yet aligned, 1 has been --> align 2 with 1's alignment
             new_align = {pair.split(':')[1]:range(samplelengths[int(pair.split(':')[1])-1])}
-            align1key = alignments.keys()[sample_in_alignments[0]]
+            align1key = sample_in_alignments[0]
             new_key = tuple(list(align1key) + [int(pair.split(':')[1])])
             alignments[new_key]= timewarp.timewarp(localdict,new_align,alignments[align1key])[0]
             msa_order.append((align1key, (int(pair.split(':')[1])), key))
             del alignments[align1key]
 
-    return (alignments[alignments.keys()[0]], msa_order)
+    return (next(iter(alignments.values())), msa_order)
 
 def datawarp(data, alignment):
     """

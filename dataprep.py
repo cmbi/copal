@@ -151,7 +151,7 @@ def match_frames(dataframes):
         list of pd dfs, matched and ordered based on index column
     """
     if len(dataframes) > 1:
-        print "creating subsets of data with matched and ordered proteins..."
+        print( "creating subsets of data with matched and ordered proteins...")
         matcheddataframes = []         
         datamatches = dataframes[1:]   
         matchframe = dataframes[0]     
@@ -241,7 +241,7 @@ def prep_data(dataframes, samplecolumns, normcol, normalisation, gseacol):
     
     # create subsets of dataframes for normalisation using normcol variable 
     if normcol != None:
-        print "creating subsets for normalisation..."
+        print( "creating subsets for normalisation...")
         normalisationdataframes = []
         for i in matcheddataframes:
             if normcol not in i.columns:
@@ -267,7 +267,7 @@ def prep_data(dataframes, samplecolumns, normcol, normalisation, gseacol):
     # perform normalisation
     if normalisation:
         # correct for varying gel intensities 
-        print "normalising data to correct for varying gel intensities..."
+        print( "normalising data to correct for varying gel intensities...")
         # select subset of normalisation proteins
         normalisation_results = gel_mod(totaldata, normalisationdata)
         modifieddata = normalisation_results[0]

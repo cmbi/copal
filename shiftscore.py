@@ -86,7 +86,7 @@ def shift_score(dataframe, groups, sample_names):
         final_frame (pd df): input dataframe with added column headers, and combined score
                              columns.
     """
-    print "determining hausdorff scores..."
+    print("determining hausdorff scores...")
     between_comp = comp_between(groups)
     within_comp = comp_within(groups)
     subframe = dataframe
