@@ -9,6 +9,8 @@ Copyright (C) 2018  Radboud universitair medisch centrum
 # import statements
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
+from tkinter import messagebox
 #import filedialog
 import COPAL_main
 import os
@@ -135,19 +137,29 @@ def check_input():
         if no error: return True
     """
     if file_name.get() == '':
-        input_status_var.set("no filename entered! please enter filename")
+        warn_msg = "no filename entered! please enter filename"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning('input error',warn_msg)
         return False
+
     if ident_col.get() == '':
-        input_status_var.set("no identifier column entered! please enter column header")
+        warn_msg = "no identifier column entered! please enter column header"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning('input error',warn_msg)
         return False
+
     if file_type.get() == 'excel':
         if sheet_name.get() == '':
-            input_status_var.set("no sheetname entered! please enter a sheetname when using an excel file")
+            warn_msg = "no sheetname entered! please enter a sheetname when using an excel file"
+            input_status_var.set(warn_msg)
+            messagebox.showwarning('input error',warn_msg)
             return False
     try:
         skip_rows.get()
     except:
-        input_status_var.set("skip rows entry not valid. enter whole number")
+        warn_msg = "skip rows entry not valid. enter whole number"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
     
     sample_names = sample_names_box.get("1.0", tk.END).splitlines()
@@ -155,14 +167,23 @@ def check_input():
     sample_columns_second = sample_columns_second_box.get("1.0", tk.END).splitlines()
     
     if sample_names == ['']:
-        input_status_var.set("no sample names entered! please enter samplenames")
+        warn_msg ="no sample names entered! please enter samplenames"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
+
     if sample_columns == [''] or sample_columns_second == ['']:
-        input_status_var.set("sample columns missing! please check input")
+        warn_msg = "sample columns missing! please check input"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
+
     if len(sample_names) != len(sample_columns) or len(sample_names) != len(sample_columns_second):
-        input_status_var.set("number of samples not equal number of sample column pairs! please check input")
+        warn_msg = "number of samples not equal number of sample column pairs! please check input"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
+
     return True
 
 def check_output():
@@ -172,40 +193,53 @@ def check_output():
         if error: set message in status label, return false
         if no error: return True
     """
-    print(input['samplenames'])
     if job_name.get() == '':
-        status_var.set("no job name entered!")
+        warn_msg = "no job name entered!"
+        status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
     if normalisation_type.get() == "Using subset from Column":
         if norm_col.get() == '':
-            status_var.set("no normalisation column header entered. required with this data normalisation option")
+            warn_msg = "no normalisation column header entered. required with this data normalisation option"
+            status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
             return False
     if normalisation_type.get() == "Using subset from File":
         if norm_file.get() == '':
-            status_var.set("no normalisation file entered. required with this normalisation option")
+            warn_msg = "no normalisation file entered. required with this normalisation option"
+            status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
             return False
     
     try:
         hausd_factor.get()
     except:
-        status_var.set("hausdorff factor entry not valid. enter numeric value")
+        warn_msg = "hausdorff factor entry not valid. enter numeric value"
+        status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
         return False
 
     if score_check.get():
         group1 = group1_text.get("1.0", tk.END).splitlines()
         group2 = group2_text.get("1.0", tk.END).splitlines()
         if group1 == [''] or group2 == ['']:
-            status_var.set("a group is empty. fields required when scoring option is selected")
+            warn_msg = "a group is empty. fields required when scoring option is selected"
+            status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
             return False
         
         groups = group1 + group2
         for sample in groups:
             if sample not in input['samplenames']:
-                status_var.set("a sample entered in one of the groups is not in sample names. please check input")
+                warn_msg = "a sample entered in one of the groups is not in sample names. please check input"
+                status_var.set(warn_msg)
+                messagebox.showwarning("input error",warn_msg)
                 return False
     if gsea_check.get():
         if gsea_col.get() == '':
-            status_var.set("no GSEA column header entered. required field if GSEA output option is selected")
+            warn_msg = "no GSEA column header entered. required field if GSEA output option is selected"
+            status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
             return False
         
     return True
@@ -377,49 +411,49 @@ def input_frame(master):
     
     # filename label and entry
     filename_label = tk.Label(master, text = "filename:").grid(column = 1, sticky = tk.E)
-    filename_entry = tk.Entry(master, textvariable = file_name, width = 50)         # create entry in master, set variable to strVar
+    filename_entry = ttk.Entry(master, textvariable = file_name, width = 50)         # create entry in master, set variable to strVar
     filename_entry.grid(row = 1, column = 2, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack 
 
     # choose filename button
-    get_file_button = tk.Button(master, text = "Choose file")
+    get_file_button = ttk.Button(master, text = "Choose file")
     get_file_button.bind("<Button-1>", get_file)
     get_file_button.grid(row = 1, column = 4, padx = 4, sticky = tk.W)
 
     # choose filetype dropdown menu
-    file_type_dropdown = tk.OptionMenu(master, file_type,"excel", "csv del ';' dec ','",
+    file_type_dropdown = ttk.OptionMenu(master, file_type,"excel", "csv del ';' dec ','",
                                          "csv del ',' dec '.'", "tsv del '\\t' dec ','",
                                          "tsv del '\\t' dec '.'")
     file_type_dropdown.grid(row = 1, column = 5, sticky = tk.EW)
 
     # skip rows label and entry
     skip_rows_label = tk.Label(master, text = "skip rows:").grid(sticky = tk.E)
-    skip_rows_entry = tk.Entry(master, textvariable = skip_rows, width = 3).grid(row = 2, column = 1)
+    skip_rows_entry = ttk.Entry(master, textvariable = skip_rows, width = 3).grid(row = 2, column = 1)
 
     #identifier label and entry
     identifier_label = tk.Label(master, text = "protein identifier column:").grid(row = 2, column = 2, sticky = tk.E)
-    identifier_entry = tk.Entry(master, textvariable = ident_col, width = 25).grid(row = 2, column = 3, sticky = tk.W)
+    identifier_entry = ttk.Entry(master, textvariable = ident_col, width = 25).grid(row = 2, column = 3, sticky = tk.W)
 
     # sheetname label and entry
     sheetname_label = tk.Label(master, text = "sheetname:").grid(row = 2, column = 4, sticky = tk.E)
-    sheetname_entry = tk.Entry(master, textvariable = sheet_name, width = 25).grid(row = 2, column = 5, padx = 4)       
+    sheetname_entry = ttk.Entry(master, textvariable = sheet_name, width = 25).grid(row = 2, column = 5, padx = 4)       
 
     # sample names label and text box
     sample_names_label = tk.Label(master, text = "sample names").grid(row = 3, column = 0, columnspan = 2, pady = 5)
-    sample_names_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE,cursor='arrow')
+    sample_names_box = tk.Text(master, height = 15, width = 30, background = "white", wrap = tk.NONE,cursor='arrow')
     sample_names_box.grid(row = 4, column = 0, columnspan = 2, padx = 10)
 
     # sample columns labels and text boxes
     sample_columns_label = tk.Label(master, text = "first column").grid(row = 3, column = 2)
-    sample_columns_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE, cursor='arrow')
+    sample_columns_box = tk.Text(master, height = 15, width = 30, background = "white", wrap = tk.NONE, cursor='arrow')
     sample_columns_box.grid(row = 4, column = 2)
     sample_columns_second_label = tk.Label(master, text = "last column").grid(row = 3, column = 3)
-    sample_columns_second_box = tk.Text(master, height = 15, width = 30, background = "gray", wrap = tk.NONE, cursor='arrow')
+    sample_columns_second_box = tk.Text(master, height = 15, width = 30, background = "white", wrap = tk.NONE, cursor='arrow')
     sample_columns_second_box.grid(row = 4, column = 3)
     
     # quit application button
-    quit_app_button = tk.Button(master, text = "quit     ")
+    quit_app_button = ttk.Button(master, text = "quit     ")
     quit_app_button.bind("<Button-1>", quit_app)
-    quit_app_button.grid(row = 5, column = 0, sticky = tk.W)    
+    quit_app_button.grid(row = 5, column = 0, sticky = tk.W,pady=5,padx=5)    
     
     # input status bar
     status_label = tk.Label(master, textvariable = input_status_var).grid(row = 5, column = 1, columnspan = 3)
@@ -429,12 +463,12 @@ def first_input_buttons(master):
     """adds button widgets, for first input frame"""
 
     #add another input file button
-    new_frame_button = tk.Button(master, text = "add another file")
+    new_frame_button = ttk.Button(master, text = "add another file")
     new_frame_button.bind("<Button-1>", save_extra_input_handler)
     new_frame_button.grid(row = 5, column = 4, sticky = tk.E)
     
     # save and proceed to output frame
-    proceed_button = tk.Button(master, text = "proceed to output")
+    proceed_button = ttk.Button(master, text = "proceed to output")
     proceed_button.bind("<Button-1>", save_proceed_handler)
     proceed_button.grid(row = 5, column = 5, sticky = tk.E)
 
@@ -444,12 +478,12 @@ def extra_input_buttons(master):
     
     add another input file button
     """
-    new_frame_button = tk.Button(master, text = "add another file")
+    new_frame_button = ttk.Button(master, text = "add another file")
     new_frame_button.bind("<Button-1>", append_extra_input_handler)
     new_frame_button.grid(row = 5, column = 4, sticky = tk.E)
     
     # append input and proceed button
-    append_input_button = tk.Button(master, text = "proceed to output")
+    append_input_button = ttk.Button(master, text = "proceed to output")
     append_input_button.bind("<Button-1>", append_proceed_handler)
     append_input_button.grid(row = 5, column = 5, sticky = tk.E)
 
@@ -465,75 +499,75 @@ def output_options_frame(master):
 
     # job_name label and entry
     job_name_label = tk.Label(master, text = "job name:").grid(column = 0, sticky = tk.E)
-    job_name_entry = tk.Entry(master, textvariable = job_name, width = 50)         # create entry in master, set variable to strVar
+    job_name_entry = ttk.Entry(master, textvariable = job_name, width = 50)         # create entry in master, set variable to strVar
     job_name_entry.grid(row = 1, column = 1, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack 
 
     # select output location folder
     select_folder_label = tk.Label(master, text = "select output folder:").grid(column = 0, sticky = tk.E)
-    select_folder_entry = tk.Entry(master, textvariable = output_folder, width = 25)
+    select_folder_entry = ttk.Entry(master, textvariable = output_folder, width = 25)
     select_folder_entry.grid(row = 2, column = 1, sticky = tk.W, pady = 4)
     
     # choose folder button
-    choose_folder_button = tk.Button(master, text = "Choose folder")
+    choose_folder_button = ttk.Button(master, text = "Choose folder")
     choose_folder_button.bind("<Button-1>", get_output_folder)
     choose_folder_button.grid(row = 2, column = 2, sticky = tk.W)
     
     # data normalisation drop-down
     normalisation_label = tk.Label(master, text = "data normalisation:").grid(sticky = tk.E, pady = 5)
-    normalisation_dropdown = tk.OptionMenu(master, normalisation_type, "None", "Using all Proteins", "Using subset from Column", "Using subset from File")
+    normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None", "Using all Proteins", "Using subset from Column", "Using subset from File")
     normalisation_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
     
     # norm_col label and entry
     norm_col_label = tk.Label(master, text = "if from column:").grid(sticky = tk.E)
-    norm_col_entry = tk.Entry(master, textvariable = norm_col, width = 25).grid(row = 4, column = 1)
+    norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 4, column = 1,sticky=tk.W)
 
     # norm_file label and entry
     norm_file_label = tk.Label(master, text = "if from file:").grid(row = 5, sticky = tk.E)
-    norm_file_entry = tk.Entry(master, textvariable = norm_file, width = 25).grid(row = 5, column = 1, sticky = tk.W)
+    norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 5, column = 1, sticky = tk.W)
     
     # choose norm_file button
-    norm_file_button = tk.Button(master, text = "Choose file")
+    norm_file_button = ttk.Button(master, text = "Choose file")
     norm_file_button.bind("<Button-1>", get_norm_file)
     norm_file_button.grid(row = 5, column = 2, padx = 4, sticky = tk.W)
 
     # score analysis check button
-    score_analysis_check = tk.Checkbutton(master, text = "perform score analysis", variable = score_check)
+    score_analysis_check = ttk.Checkbutton(master, text = "perform score analysis", variable = score_check)
     score_analysis_check.grid(sticky = tk.W)        # create checkbutton, set text, assign to boolVar variable
 
     # score analysis group text boxes
     group1_label = tk.Label(master, text = "group 1 samples").grid(row = 6, column = 1)
     group2_label = tk.Label(master, text = "group 2 samples").grid(row = 6, column = 2)
-    group1_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE,cursor = 'arrow')
+    group1_text = tk.Text(master, height = 10, width = 25, background = "white", wrap = tk.NONE,cursor = 'arrow')
     group1_text.grid(column = 1)
-    group2_text = tk.Text(master, height = 10, width = 25, background = "gray", wrap = tk.NONE,cursor='arrow')
+    group2_text = tk.Text(master, height = 10, width = 25, background = "white", wrap = tk.NONE,cursor='arrow')
     group2_text.grid(row = 7, column = 2)
     
     # hausdorff factor label and entry
     hausd_factor_label = tk.Label(master, text = 'hausdorff factor:').grid(row = 6, column = 3)
-    hausd_factor_entry = tk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 7, column = 3, sticky = tk.N)
+    hausd_factor_entry = ttk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 7, column = 3, sticky = tk.N)
 
     # GSEA check button and column entry
     GSEA_check = tk.Checkbutton(master, text = "provide rank ordered protein list", variable = gsea_check).grid(columnspan = 2, sticky = tk.W, pady = 10)
     GSEA_col_label = tk.Label(master, text = "ranked list identifier column:").grid(row = 8, column = 2, sticky = tk.E)
-    GSEA_col_entry = tk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W) 
+    GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W) 
 
     # status label
     status_label = tk.Label(master, textvariable = status_var).grid(row = 9, column = 1, columnspan = 4)
         
     # save and run button
-    save_settings_button = tk.Button(master, text = "save and run")
+    save_settings_button = ttk.Button(master, text = "save and run")
     save_settings_button.bind("<Button-1>", save_output_and_run_handler)
     save_settings_button.grid(row = 9, column = 5, sticky = tk.E)
     
     # quit application button
-    quit_app_button = tk.Button(master, text = "quit  ")
+    quit_app_button = ttk.Button(master, text = "quit  ")
     quit_app_button.bind("<Button-1>", quit_app)
-    quit_app_button.grid(row = 9, column = 0, sticky = tk.W)    
+    quit_app_button.grid(row = 9, column = 0, sticky = tk.W,pady=5,padx=5)    
     
     # back to input button
-    back_to_input_button = tk.Button(master, text = "back to start")
+    back_to_input_button = ttk.Button(master, text = "back to start")
     back_to_input_button.bind("<Button-1>", back_to_input_handler)
-    back_to_input_button.grid(row = 9, column = 0, sticky = tk.E)
+    back_to_input_button.grid(row = 9, column = 1, sticky = tk.W,pady=5,padx=5)
 
     # sample names message box
     sample_names_message = "Sample names:\n\n" + '\n'.join(input['samplenames'])
@@ -552,9 +586,10 @@ def first_input_frame():
 if __name__ == "__main__":
     # initialise root
     root = tk.Tk()
-    root.wm_title("master")
-    root.resizable(0,0)
-
+    root.wm_title("COPAL")
+    root.geometry("1080x520")
+    #root.resizable(0,0)
+    root.iconbitmap('Copal.ico')
     # initialize tkinter variables
     job_name = tk.StringVar()
     file_name = tk.StringVar()
