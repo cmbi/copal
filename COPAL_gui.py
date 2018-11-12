@@ -11,10 +11,11 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 from tkinter import messagebox
-#import filedialog
-import COPAL_main
 import os
 import threading
+
+#import copal
+import copal
 
 # ---------- INPUT PROCESSING AND HELPER FUNCTIONS ---------- #
 
@@ -24,7 +25,7 @@ def get_type(type):
         return "excel"
     elif type == "csv del ';' dec ','":
         return (';', ',')
-    elif type == "csv del ',' dec '.'":  
+    elif type == "csv del ',' dec '.'":
         return (',', '.')
     elif type == "tsv del '\\t' dec ','":
         return ('\t', ',')
@@ -32,14 +33,14 @@ def get_type(type):
         return ('\t', '.')
 
 def get_sample_columns(first, last):
-    """ takes input from samplecolumn widgets, combines into list of tuples for each 
+    """ takes input from samplecolumn widgets, combines into list of tuples for each
     sample """
     return [(x,y) for x,y in zip(first,last)]
 
 def get_groups(group1, group2, samplenames):
     """takes sample names, transforms to numbers to fit main program"""
     group1_index = [samplenames.index(i) + 1 for i in group1]
-    group2_index = [samplenames.index(i) + 1 for i in group2] 
+    group2_index = [samplenames.index(i) + 1 for i in group2]
     return [group1_index, group2_index]
 
 def get_normalisation(normtype, normcol, normfile):
@@ -50,7 +51,7 @@ def get_normalisation(normtype, normcol, normfile):
     Returns:
         norm_check -- boolean, wether to perform normalisation
         normcol -- string, header of input datacolumn that contains normalisation booleans
-        normfile -- string, path/name of file containing protein IDs to be used for 
+        normfile -- string, path/name of file containing protein IDs to be used for
                     normalisation
     """
     if normtype == "None":
@@ -69,7 +70,7 @@ def get_normalisation(normtype, normcol, normfile):
         normcol = None
         normfile = normfile
     return (norm_check, normcol, normfile)
-    
+
 def save_input_settings():
     """ saves first input file settings to global input variables """
     global input
@@ -92,7 +93,7 @@ def clear_input_vars():
     sample_columns_second_box.delete('1.0', tk.END)
     ident_col.set("")
     sheet_name.set("")
-    
+
 def append_extra_input():
     """ appends extra file input to existing global variable lists"""
     global input
@@ -105,7 +106,7 @@ def append_extra_input():
     input['samplenames'] += sample_names_box.get("1.0", tk.END).splitlines()
     input['identifier'].append(ident_col.get())
     input['sheetname'].append(sheet_name.get())
-    
+
 def save_output_settings():
     """saves output settings to global variables"""
     global input
@@ -127,7 +128,7 @@ def save_output_settings():
         input['groups'] = get_groups(group1, group2, input['samplenames'])
     else:
         input['groups'] = None
-        
+
 def check_input():
     """
     checks input details for possible errors in input data entry by user
@@ -161,11 +162,11 @@ def check_input():
         input_status_var.set(warn_msg)
         messagebox.showwarning("input error",warn_msg)
         return False
-    
+
     sample_names = sample_names_box.get("1.0", tk.END).splitlines()
     sample_columns = sample_columns_box.get("1.0", tk.END).splitlines()
     sample_columns_second = sample_columns_second_box.get("1.0", tk.END).splitlines()
-    
+
     if sample_names == ['']:
         warn_msg ="no sample names entered! please enter samplenames"
         input_status_var.set(warn_msg)
@@ -210,7 +211,7 @@ def check_output():
             status_var.set(warn_msg)
             messagebox.showwarning("input error",warn_msg)
             return False
-    
+
     try:
         hausd_factor.get()
     except:
@@ -227,7 +228,7 @@ def check_output():
             status_var.set(warn_msg)
             messagebox.showwarning("input error",warn_msg)
             return False
-        
+
         groups = group1 + group2
         for sample in groups:
             if sample not in input['samplenames']:
@@ -241,9 +242,9 @@ def check_output():
             status_var.set(warn_msg)
             messagebox.showwarning("input error",warn_msg)
             return False
-        
+
     return True
-            
+
 def print_input():
     """prints out global input variables to stdout"""
     print("file name: ", input['filename'])
@@ -269,18 +270,18 @@ def print_output():
 def run_analysis():
     """
     runs main function in COPAL_main module, running COPAL analysis
-    
+
     global input dictionary is provided as input argument to COPAL_main.main()
     """
     save_settings_button.unbind("<Button-1>")
     try:
-        COPAL_main.main(input = input)
-        status_var.set("analysis complete! your output is in: " + output_folder.get() + "/" + input['analysis_name'] + "_results")  
+        copal.main(input = input)
+        status_var.set("analysis complete! your output is in: " + output_folder.get() + "/" + input['analysis_name'] + "_results")
     except Exception as e:
         status_var.set("Error occured. Check and re-enter input.  " + str(e))
         print("something went wrong! please check and re-enter your input")
         print("error message: ", e)
-    save_settings_button.bind("<Button-1>", save_output_and_run_handler) 
+    save_settings_button.bind("<Button-1>", save_output_and_run_handler)
 
 # ---------- EVENT HANDLERS ---------- #
 
@@ -296,7 +297,7 @@ def quit_app(event = None):
 def get_file(event = None):
     """
     choose file button handler, opens menu to browse for file
-    
+
     assigns path/filename to global file_name variable
     """
     file_name.set(filedialog.askopenfilename(title = 'Choose a file'))
@@ -304,7 +305,7 @@ def get_file(event = None):
 def get_norm_file(event = None):
     """
     choose file button event handler, opens menu to browse for a file
-    
+
     assigns path/gilename to global file_name variable
     """
     norm_file.set(filedialog.askopenfilename(title = 'Choose a file'))
@@ -312,7 +313,7 @@ def get_norm_file(event = None):
 def get_output_folder(event = None):
     """
     choose folder button event handler, opens menu to browse for folder,
-    
+
     stores path to stringvar variable output_folder
     """
     output_folder.set(filedialog.askdirectory(title = 'Choose folder'))
@@ -320,7 +321,7 @@ def get_output_folder(event = None):
 def save_proceed_handler(event = None):
     """
     save and proceed button event handler (for first input frame)
-    
+
     checks if input seems ok, does not proceed and sets warning if not
     """
     if check_input():
@@ -329,11 +330,11 @@ def save_proceed_handler(event = None):
         output_frame.grid(row = 0, column = 0, sticky = "news")
         output_options_frame(output_frame)
         output_frame.tkraise()
-    
+
 def append_proceed_handler(event = None):
     """
     append and proceed button event handler (for later input frames)
-    
+
     appends input, creates output frame, adds widgets to output frame
     checks if input seems okm does not proceed and sets warning if not
     """
@@ -344,17 +345,17 @@ def append_proceed_handler(event = None):
         output_frame.grid(row = 0, column = 0, sticky = "news")
         output_options_frame(output_frame)
         output_frame.tkraise()
-    
+
 def save_extra_input_handler(event = None):
     """
     save and extra input button event handler (for first input frame)
-    
+
     saves input to globals, clears input variables, creates new input frame
     checks if input seems ok, waits and sets warning otherwise
     """
-    if check_input():   
-        save_input_settings()       
-        clear_input_vars()     
+    if check_input():
+        save_input_settings()
+        clear_input_vars()
         extra_frame = tk.Frame(root)
         extra_frame.grid(row = 0, column = 0, sticky = "news")
         input_frame(extra_frame)
@@ -364,7 +365,7 @@ def save_extra_input_handler(event = None):
 def append_extra_input_handler(event = None):
     """
     append_extra input button event handler (for later input frames)
-    
+
     appends extra input to globals, clears input vars, creates new input frame
     checks if input seems ok, waits and sets warning otherwise
     """
@@ -380,7 +381,7 @@ def append_extra_input_handler(event = None):
 def save_output_and_run_handler(event = None):
     """
     save output options and run button event handler (for output options frame)
-    
+
     saves output to globals, set status label stringvar, tries main
     in case of except: set status label with error message
     """
@@ -391,7 +392,7 @@ def save_output_and_run_handler(event = None):
             status_var.set("Output folder does not exist! re-select folder and try again")
             root.update_idletasks()
             return
-        
+
         status_var.set("Running analysis. This might take a while...")
         root.update_idletasks()                # ensures the status label gets updated in a timely fashion
         save_output_settings()
@@ -408,11 +409,11 @@ def input_frame(master):
     """
     global sample_names_box, sample_columns_box, sample_columns_second_box
     tk.Label(master, text = "COPAL -- COmplexome Profile ALignment\n", font = ("Helvetica", 18), pady = 20).grid(columnspan = 6)
-    
+
     # filename label and entry
     filename_label = tk.Label(master, text = "filename:").grid(column = 1, sticky = tk.E)
     filename_entry = ttk.Entry(master, textvariable = file_name, width = 50)         # create entry in master, set variable to strVar
-    filename_entry.grid(row = 1, column = 2, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack 
+    filename_entry.grid(row = 1, column = 2, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack
 
     # choose filename button
     get_file_button = ttk.Button(master, text = "Choose file")
@@ -435,7 +436,7 @@ def input_frame(master):
 
     # sheetname label and entry
     sheetname_label = tk.Label(master, text = "sheetname:").grid(row = 2, column = 4, sticky = tk.E)
-    sheetname_entry = ttk.Entry(master, textvariable = sheet_name, width = 25).grid(row = 2, column = 5, padx = 4)       
+    sheetname_entry = ttk.Entry(master, textvariable = sheet_name, width = 25).grid(row = 2, column = 5, padx = 4)
 
     # sample names label and text box
     sample_names_label = tk.Label(master, text = "sample names").grid(row = 3, column = 0, columnspan = 2, pady = 5)
@@ -449,16 +450,16 @@ def input_frame(master):
     sample_columns_second_label = tk.Label(master, text = "last column").grid(row = 3, column = 3)
     sample_columns_second_box = tk.Text(master, height = 15, width = 30, background = "white", wrap = tk.NONE, cursor='arrow')
     sample_columns_second_box.grid(row = 4, column = 3)
-    
+
     # quit application button
     quit_app_button = ttk.Button(master, text = "quit     ")
     quit_app_button.bind("<Button-1>", quit_app)
-    quit_app_button.grid(row = 5, column = 0, sticky = tk.W,pady=5,padx=5)    
-    
+    quit_app_button.grid(row = 5, column = 0, sticky = tk.W,pady=5,padx=5)
+
     # input status bar
     status_label = tk.Label(master, textvariable = input_status_var).grid(row = 5, column = 1, columnspan = 3)
 
-    
+
 def first_input_buttons(master):
     """adds button widgets, for first input frame"""
 
@@ -466,7 +467,7 @@ def first_input_buttons(master):
     new_frame_button = ttk.Button(master, text = "add another file")
     new_frame_button.bind("<Button-1>", save_extra_input_handler)
     new_frame_button.grid(row = 5, column = 4, sticky = tk.E)
-    
+
     # save and proceed to output frame
     proceed_button = ttk.Button(master, text = "proceed to output")
     proceed_button.bind("<Button-1>", save_proceed_handler)
@@ -474,14 +475,14 @@ def first_input_buttons(master):
 
 def extra_input_buttons(master):
     """
-    adds button widgets, for extra input frames 
-    
+    adds button widgets, for extra input frames
+
     add another input file button
     """
     new_frame_button = ttk.Button(master, text = "add another file")
     new_frame_button.bind("<Button-1>", append_extra_input_handler)
     new_frame_button.grid(row = 5, column = 4, sticky = tk.E)
-    
+
     # append input and proceed button
     append_input_button = ttk.Button(master, text = "proceed to output")
     append_input_button.bind("<Button-1>", append_proceed_handler)
@@ -490,7 +491,7 @@ def extra_input_buttons(master):
 def output_options_frame(master):
     """
     creates output widgets for output info frame
-    
+
     asigns text box widgets' content to global variables
     """
     global group1_text, group2_text, save_settings_button
@@ -500,23 +501,23 @@ def output_options_frame(master):
     # job_name label and entry
     job_name_label = tk.Label(master, text = "job name:").grid(column = 0, sticky = tk.E)
     job_name_entry = ttk.Entry(master, textvariable = job_name, width = 50)         # create entry in master, set variable to strVar
-    job_name_entry.grid(row = 1, column = 1, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack 
+    job_name_entry.grid(row = 1, column = 1, columnspan = 2, sticky = tk.W, pady = 4)                            # add to frame with pack
 
     # select output location folder
     select_folder_label = tk.Label(master, text = "select output folder:").grid(column = 0, sticky = tk.E)
     select_folder_entry = ttk.Entry(master, textvariable = output_folder, width = 25)
     select_folder_entry.grid(row = 2, column = 1, sticky = tk.W, pady = 4)
-    
+
     # choose folder button
     choose_folder_button = ttk.Button(master, text = "Choose folder")
     choose_folder_button.bind("<Button-1>", get_output_folder)
     choose_folder_button.grid(row = 2, column = 2, sticky = tk.W)
-    
+
     # data normalisation drop-down
     normalisation_label = tk.Label(master, text = "data normalisation:").grid(sticky = tk.E, pady = 5)
     normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None", "Using all Proteins", "Using subset from Column", "Using subset from File")
     normalisation_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
-    
+
     # norm_col label and entry
     norm_col_label = tk.Label(master, text = "if from column:").grid(sticky = tk.E)
     norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 4, column = 1,sticky=tk.W)
@@ -524,7 +525,7 @@ def output_options_frame(master):
     # norm_file label and entry
     norm_file_label = tk.Label(master, text = "if from file:").grid(row = 5, sticky = tk.E)
     norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 5, column = 1, sticky = tk.W)
-    
+
     # choose norm_file button
     norm_file_button = ttk.Button(master, text = "Choose file")
     norm_file_button.bind("<Button-1>", get_norm_file)
@@ -541,7 +542,7 @@ def output_options_frame(master):
     group1_text.grid(column = 1)
     group2_text = tk.Text(master, height = 10, width = 25, background = "white", wrap = tk.NONE,cursor='arrow')
     group2_text.grid(row = 7, column = 2)
-    
+
     # hausdorff factor label and entry
     hausd_factor_label = tk.Label(master, text = 'hausdorff factor:').grid(row = 6, column = 3)
     hausd_factor_entry = ttk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 7, column = 3, sticky = tk.N)
@@ -549,21 +550,21 @@ def output_options_frame(master):
     # GSEA check button and column entry
     GSEA_check = tk.Checkbutton(master, text = "provide rank ordered protein list", variable = gsea_check).grid(columnspan = 2, sticky = tk.W, pady = 10)
     GSEA_col_label = tk.Label(master, text = "ranked list identifier column:").grid(row = 8, column = 2, sticky = tk.E)
-    GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W) 
+    GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W)
 
     # status label
     status_label = tk.Label(master, textvariable = status_var).grid(row = 9, column = 1, columnspan = 4)
-        
+
     # save and run button
     save_settings_button = ttk.Button(master, text = "save and run")
     save_settings_button.bind("<Button-1>", save_output_and_run_handler)
     save_settings_button.grid(row = 9, column = 5, sticky = tk.E)
-    
+
     # quit application button
     quit_app_button = ttk.Button(master, text = "quit  ")
     quit_app_button.bind("<Button-1>", quit_app)
-    quit_app_button.grid(row = 9, column = 0, sticky = tk.W,pady=5,padx=5)    
-    
+    quit_app_button.grid(row = 9, column = 0, sticky = tk.W,pady=5,padx=5)
+
     # back to input button
     back_to_input_button = ttk.Button(master, text = "back to start")
     back_to_input_button.bind("<Button-1>", back_to_input_handler)
@@ -588,8 +589,14 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.wm_title("COPAL")
     root.geometry("1080x520")
-    #root.resizable(0,0)
-    root.iconbitmap('Copal.ico')
+    #root.resizable(0,0)        # prevents window from being resized
+
+    # try to set application icon (does not work on all platforms)
+    try:
+        root.iconbitmap(os.path.join(os.getcwd(),'static/Copal.ico'))
+    except:
+        pass
+
     # initialize tkinter variables
     job_name = tk.StringVar()
     file_name = tk.StringVar()

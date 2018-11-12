@@ -1,4 +1,4 @@
-""" 
+"""
 main COPAL module that runs analysis without GUI wrapper
 
 part of: COPAL -- COmplexome Profile ALignment Tool
@@ -6,21 +6,26 @@ Copyright (C) 2018  Radboud universitair medisch centrum
     for full notice, reference readme.md
 """
 # import statements
+
+# external imports
 import pandas as pd
-import dataprep, os
-import localdist  
-import multipletimewarp as msa_warp
-import findshift
-import shiftscore
-import datatoexcel
-import txtoutput as out
+import os
+
+# package modules
+from . import dataprep
+from . import localdist
+from . import multipletimewarp as msa_warp
+from . import findshift
+from . import shiftscore
+from . import datatoexcel
+from . import txtoutput as out
 
 # functions
 # ---------------------- input Data processing ---------------------------#
 def input_processing(input):
     """
     performs input processing. loading data, combining datasets, normalisation.
-    
+
     Keyword arguments:
         input -- dict, containing all provided input for analysis
     Returns:
@@ -40,10 +45,10 @@ def input_processing(input):
         dataframes.append(dataprep.multi_dataload(input['identifier'][i],
                           input['filename'][i], input['sheetname'][i],
                           input['skiprows'][i], input['input_type'][i]))
-    
+
     #CHECK IF INPUT MATCHES LOADED DATA
     dataprep.input_checker(dataframes, input)
-                          
+
     #IF NESCESSARY: ADD NORMALISATION COLUMN
     if input['normfile'] != None:          # check if normlist value is not None.
         print( "loading normalisation IDs from file..."  )
@@ -53,13 +58,13 @@ def input_processing(input):
                                   input['identifier'][i], dataframes[i]))
         dataframes = new_dataframes
         # change normcolumn variable to name of column that was just created.
-        input['normcol'] = 'norm'                  
-    
+        input['normcol'] = 'norm'
+
     # PREPARE DATA FOR TIME WARPING
     prepareddata = dataprep.prep_data(dataframes, input['samplecolumns'],
                                       input['normcol'], input['norm_check'],
                                       input['GSEA_rank_column'])
-                                      
+
     matcheddataframes = prepareddata[0]
     samplelengths = prepareddata[1]
     modifieddata = prepareddata[2]
@@ -72,14 +77,14 @@ def input_processing(input):
     print( "length of matched dataframes:")
     for i in matcheddataframes:
         print( len(i.index.values))
-    return (matcheddataframes, samplelengths, modifieddata, mod_factors, original_frame_lengths) 
+    return (matcheddataframes, samplelengths, modifieddata, mod_factors, original_frame_lengths)
 
 
 # ---------------------- Complexome profile alignment ---------------------------#
 def complexome_alignment(template_df, samplelengths, modifieddata, input):
     """
     performs complexome alignment
-    
+
     Keyword arguments:
         template_df   -- pandas dataframe, contains all data provided in first dataset.
                          aligned data is inserted into this template dataframe.
@@ -110,7 +115,7 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
     pairwisedict = pairwise_warp[0]
     pairwisecosts = pairwise_warp[1]
     paircostkeys = pairwisecosts.keys()
-    
+
     # DETERMINE ALINGMENT ORDER FOR MSA, PERFORM ALIGNMENTS
     print( "performing multiple alignments..."   )
     multiple_alignment = msa_warp.multiple_timewarp(pairwisecosts,samplelengths,localdict,pairwisedict)
@@ -131,13 +136,13 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
     dataloc = (input['samplenames'][0] + "_1", input['samplenames'][-1] + "_" + str(align_lengths[-1]))   # headers of first and last data containing columns
 
     return (final_alignment, multiple_alignment_order, final_align_length, dataloc, newdataframe, pairwisecosts)
-    
-    
+
+
 # ---------------------- Hausdorff score calculation ---------------------------#
 def hausdorff_scoring(input, final_alignment, final_align_length, dataloc, newdataframe):
     """
     performs hausdorff scoring analysis on aligned dataframe
-    
+
     Keyword arguments:
         input -- dict, containing all provided input for analysis
         final_alignment -- dictionary with aligned slice index list for each sample
@@ -151,7 +156,7 @@ def hausdorff_scoring(input, final_alignment, final_align_length, dataloc, newda
     """
     samplenum = len(input['samplenames'])
     align_lengths = [final_align_length] * samplenum
-    
+
     # determine hausdorff distances and combined hausdorff scores
     nakedframe = findshift.strip_frame(newdataframe, dataloc)
     shift_frame = findshift.find_hausdorff(nakedframe, align_lengths, newdataframe, final_alignment, input['groups'], input['normcol'], input['hausd_factor'])
@@ -160,33 +165,33 @@ def hausdorff_scoring(input, final_alignment, final_align_length, dataloc, newda
     # ADD COMBINED SCORE AND INT DIFFS TO MAIN DATAFRAME
     combined_score = score_frame['Combined']
     intensity_diffs = score_frame['intensity diffs']
-    newdataframe = pd.concat([newdataframe, intensity_diffs, combined_score], axis = 1)
+    newdataframe = pd.concat([newdataframe, intensity_diffs, combined_score], axis = 1, sort = True)
     newdataframe.index.name = score_frame.index.name
-    
-    return (score_frame, newdataframe)      
+
+    return (score_frame, newdataframe)
 
 # ---------------------- Output results  ---------------------------#
 def output_results(input, output):
     """
     produces output files of results and prints information to stdout
-    
+
     produces results folder containing
-        - excel file with aligned profiles, hausdorff scores, migration pattern graphs 
+        - excel file with aligned profiles, hausdorff scores, migration pattern graphs
         - csv file of aligned profiles
         - csv file of hausdorff scores
         - text file with info on alignment process
-        - .rnk file: ranked list with hausdorff effect size values for GSEA 
+        - .rnk file: ranked list with hausdorff effect size values for GSEA
         - info on alignment process to stdout
     Keyword arguments:
         input -- dict, containing all provided input for analysis
         output -- dict, containing results produced during COPAL analysis
     Returns:
         None
-    """ 
+    """
     samplenum = len(input['samplenames'])
     align_lengths = [output['final_align_length']] * samplenum
-    
-    # PREPARE FOR OUTPUT 
+
+    # PREPARE FOR OUTPUT
     # get file names for output files
     excel_output = input['analysis_name'] + ".xlsx"
     csv_score_frame = input['analysis_name'] + "_score_frame.csv"
@@ -215,27 +220,27 @@ def output_results(input, output):
         print( "generating .rnk files...")
         # add identifier column for .rnk file to score frame
         rank_ident = output['newdataframe'][input['GSEA_rank_column']]
-        rank_frame = pd.concat([output['score_frame'], rank_ident], axis = 1)
+        rank_frame = pd.concat([output['score_frame'], rank_ident], axis = 1, sort = True)
 
-        # create ranked file with combined hausdorff score 
+        # create ranked file with combined hausdorff score
         out.create_ranked_file(input['analysis_name'] +'_comb_hausd_ranked_file.rnk', rank_frame, (input['GSEA_rank_column'], 'Combined'))
-        
+
     # PROVIDE ALIGNMENT INFO TEXT OUTPUT (to stdout and .txt file)
     out.text_output(input, output, align_info, output_path)
-    
+
 # ---------------------- main function ---------------------------#
 def main(input = input):
     """
     main function that runs COPAL analysis
-    
+
     Keyword arguments:
         input -- dictionary containing required input for COPAL analysis
             'analysis name': string, name for current analysis, used in output files
-            'filename': list of strings, path/name of files containing complexome profiles  
+            'filename': list of strings, path/name of files containing complexome profiles
             'skiprows': list of numbers, number of header rows to skip for each input file
             'input_type': list, specifying format of each input file.
                         - if excel: 'excel'
-                        - if text: ('column seperator','decimal seperator') 
+                        - if text: ('column seperator','decimal seperator')
             'samplecolumns': list of tuples with headers of first and last columns
                              containing profiling data for each sample
             'identifier': list of strings, header of column identifying proteins for each
@@ -246,13 +251,13 @@ def main(input = input):
             'norm_check': boolean, specifying if normalisation is to be performed
             'normcol': string, header of column indicating proteins to be used for
                        normalisation
-            'normfile': string: path/file of text file containing identifiers of proteins 
+            'normfile': string: path/file of text file containing identifiers of proteins
                         to be used for normalisation
             'hausdorff_scoring': boolean or 1/0, specifying whether to perform hausdorff
                                  scoring
             'gsea_output': boolean, specifying whether to produce .rnk file output for
                            GSEA analysis
-            'GSEA_rank_column': string, header of column to be used as identifier in .rnk 
+            'GSEA_rank_column': string, header of column to be used as identifier in .rnk
                                 output for GSEA analysis
             'groups': list of 2 lists containing sample numbers for groups to be used for
                       hausdorff effect size calculation
@@ -261,7 +266,7 @@ def main(input = input):
     Returns None
     """
     output = {}
-    
+
     processed_input = input_processing(input)
     matched_dataframes = processed_input[0]
     output['samplelengths'] = processed_input[1]
@@ -276,7 +281,7 @@ def main(input = input):
     output['dataloc'] = align_result[3]
     output['newdataframe'] = align_result[4]
     output['pairwisecosts'] = align_result[5]
-        
+
     if input['hausdorff_scoring']:
         hausdorff_result = hausdorff_scoring(input, output['final_alignment'], output['final_align_length'],
                                              output['dataloc'], output['newdataframe'])
@@ -284,18 +289,21 @@ def main(input = input):
         output['newdataframe'] = hausdorff_result[1]
     else:
         output['score_frame'] = None
-        
+
     output_results(input, output)
-    
+
 
 if __name__ == "__main__":
 
+    # test data paths
+    file_1 = os.path.join('test_data','Gel1_unaligned_samples_500_rows.csv')
+    file_2 = os.path.join('test_data','Gel2_unaligned_samples_500_rows.csv')
+    file_3 = os.path.join('test_data','Gel3_unaligned_samples_500_rows.csv')
 
     # input dict values for analysis run with test files
     input = {}
-    
     input['analysis_name'] = 'test_run'
-    input['filename'] = ['Gel1_unaligned_samples_500_rows.csv', 'Gel2_unaligned_samples_500_rows.csv', 'Gel3_unaligned_samples_500_rows.csv']
+    input['filename'] = [file_1, file_2, file_3]
     input['skiprows'] = [0, 0, 0]
     input['input_type'] = [(',', '.'), (',', '.'), (',', '.')]
     input['samplecolumns'] = [[(u'S1_G1_01', u'S1_G1_60'), (u'S2_G1_01', u'S2_G1_60'), (u'S3_G1_01', u'S3_G1_60'), (u'S4_G1_01', u'S4_G1_60'), (u'S5_G1_01', u'S5_G1_60')], [(u'S1_G2_01', u'S1_G2_60'), (u'S2_G2_01', u'S2_G2_60'), (u'S3_G2_01', u'S3_G2_60')], [(u'S1_G3_01', u'S1_G3_60')]]
@@ -307,10 +315,9 @@ if __name__ == "__main__":
     input['normfile'] = None
     input['hausdorff_scoring'] = 1
     input['gsea_output'] = 1
-    input['GSEA_rank_column'] = 'Gene Symbol' 
+    input['GSEA_rank_column'] = 'Gene Symbol'
     input['groups'] = [[1, 2, 3, 4, 5], [6, 7, 8, 9]]
     input['hausd_factor'] = 1.0
 
     # main function call, starting COPAL analysis
     main(input = input)
-    
