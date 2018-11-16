@@ -22,21 +22,21 @@ To run the packaged tool with GUI, execute the executable single file on your pr
 
 ## Test Example
 
-*test input files:*
+*test data:*
 
 * Gel1\_unaligned\_samples\_500\_rows.csv
 * Gel2\_unaligned\_samples\_500\_rows.csv
 * Gel3\_unaligned\_samples\_500\_rows.csv
 
 To run COPAL on test data, run example_run.py
-For documentation on how to run test data using the GUI, refer to the user guide
+For documentation on how to run an analysis using the GUI, refer to the user guide
 
 ### Modules:
 
 **COPAL main modules**
 
-* *maindtw* -- Contains higher level functions running steps of the analysis specified below. run this module to run COPAL analysis without GUI wrapper
-* *gui* -- Contains code that wraps COPAL analysis with a GUI. run this module to run COPAL with GUI wrapper
+* *COPAL_main* -- Contains higher level functions running steps of the analysis specified below. run this module to run COPAL analysis without GUI wrapper
+* *COPAL_gui* -- Contains code that wraps COPAL analysis with a GUI. run this module to run COPAL with GUI wrapper
 
 **Progressive alignment modules**
 

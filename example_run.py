@@ -26,3 +26,36 @@ input['groups'] = [[1, 2, 3, 4, 5], [6, 7, 8, 9]]
 input['hausd_factor'] = 1.0
 
 copal.main(input = input)
+
+"""
+----input dictionary: containing required input for COPAL analysis----
+
+        'analysis name': string, name for current analysis, used in output files
+        'filename': list of strings, path/name of files containing complexome profiles
+        'skiprows': list of numbers, number of header rows to skip for each input file
+        'input_type': list, specifying format of each input file.
+                    - if excel: 'excel'
+                    - if text: ('column seperator','decimal seperator')
+        'samplecolumns': list of tuples with headers of first and last columns
+                         containing profiling data for each sample
+        'identifier': list of strings, header of column identifying proteins for each
+                      file
+        'sheetname': list of strings, names of excel sheets containing data for each
+                     file. empty strings if not excel files
+        'samplenames': list of strings, name for each sample
+        'norm_check': boolean, specifying if normalisation is to be performed
+        'normcol': string, header of column indicating proteins to be used for
+                   normalisation
+        'normfile': string: path/file of text file containing identifiers of proteins
+                    to be used for normalisation
+        'hausdorff_scoring': boolean or 1/0, specifying whether to perform hausdorff
+                             scoring
+        'gsea_output': boolean, specifying whether to produce .rnk file output for
+                       GSEA analysis
+        'GSEA_rank_column': string, header of column to be used as identifier in .rnk
+                            output for GSEA analysis
+        'groups': list of 2 lists containing sample numbers for groups to be used for
+                  hausdorff effect size calculation
+        'hausd_factor' (float): ratio of height to width of plain in which hausdorff
+                                distances are calculated
+"""
