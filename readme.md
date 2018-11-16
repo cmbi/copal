@@ -4,6 +4,33 @@
 COPAL is a tool that aligns complexome profile samples using an adaptation on the dynamic time warping algorithm.
 After alignment it can quantify differences in protein migration patterns between sample groups using the hausdorff effect size
 
+## Installation
+
+COPAL can be installed by cloning this repository.
+To run the tool from python, run the maindtw.py module.
+To run the tool with the GUI wrapper from python, run the gui.py module.
+To run the packaged tool with GUI, execute the executable single file on your preferred platform (Windows, Linux or Mac).
+
+### requirements
+
+* python 3  (for python2 switch to py2_version branch)
+* numpy
+* pandas
+* tkinter
+* xlsxwriter
+* xlrd
+
+## Test Example
+
+*test input files:*
+
+* Gel1\_unaligned\_samples\_500\_rows.csv
+* Gel2\_unaligned\_samples\_500\_rows.csv
+* Gel3\_unaligned\_samples\_500\_rows.csv
+
+To run COPAL on test data, run example_run.py
+For documentation on how to run test data using the GUI, refer to the user guide
+
 ### Modules:
 
 **COPAL main modules**
@@ -32,30 +59,6 @@ After alignment it can quantify differences in protein migration patterns betwee
 
 * *datatoexcel* -- Produces excel output of COPAL results
 * *txtoutput* -- Produces text output with information on COPAL process. writes to file and to stdout
-
-## Test Example
-
-*test input files:*
-
-* Gel1\_unaligned\_samples\_500\_rows.csv
-* Gel2\_unaligned\_samples\_500\_rows.csv
-* Gel3\_unaligned\_samples\_500\_rows.csv
-
-To run COPAL on test data, run COPAL_main.py
-For documentation on how to run test data using the GUI, refer to the user guide
-
-## Installation
-
-COPAL can be installed by cloning this repository.
-To run the tool from python, run the maindtw.py module.
-To run the tool with the GUI wrapper from python, run the gui.py module.
-To run the packaged tool with GUI, execute the executable single file on your preferred platform (Windows, Linux or Mac).
-
-### requirements
-
-* python 2.7
-* pandas
-* tkinter
 
 ## License
 
