@@ -62,7 +62,7 @@ def multi_dataload(identifier, filename, sheet, skip_rows, file_type):
             pandas dataframe, with protein identifiers as index column
     """
     if file_type == 'excel':
-        data = pd.read_excel(filename, sheetname = sheet, skiprows = skip_rows)
+        data = pd.read_excel(filename, sheet_name = sheet, skiprows = skip_rows)
     else:
         data = pd.read_csv(filename, skiprows = skip_rows, sep = file_type[0], decimal = file_type[1])
     if not identifier in data.columns:

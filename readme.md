@@ -16,7 +16,6 @@ To run the packaged tool with GUI, execute the executable single file on your pr
 * python 3  (for python2 switch to py2_version branch)
 * numpy
 * pandas
-* tkinter
 * xlsxwriter
 * xlrd
 
