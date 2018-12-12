@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 from . import hausdorff
 
-
 # functions
 def strip_frame(dataframe, dataloc):
     """
@@ -103,8 +102,9 @@ def find_hausdorff(dataframe, samplelengths, mainframe, alignment, groups, normc
     distdata = []
     intensity_diffs = []
     counter = 1
+    total = dataframe.shape[0]
     for row in dataframe.itertuples():
-        print("starting on new protein: #", counter)
+        print("\rcomputing hausdorff for protein {} of {}...      ".format(counter, total), end="", flush=True)
         index = row[0]
         data = list(row)[1:]
         slices = slicer(data, samplelengths)   # slice rows into seperate series per sample
@@ -113,6 +113,7 @@ def find_hausdorff(dataframe, samplelengths, mainframe, alignment, groups, normc
         hausdorffs = pairwise_hausdorff(slices) # calculate hausdorff distances
         distdata.append((index, hausdorffs))
         counter += 1
+    print()
     samplenum = len(samplelengths)
     headers = get_headers(samplenum)
     dist_frame = pd.DataFrame.from_items(distdata, orient = 'index', columns = headers)
@@ -139,7 +140,6 @@ def pairwise_hausdorff(slices):
             hausdorffs.append(hausdorff.hausdorff(sample, target))
         del targets[0]
     return hausdorffs
-
 
 def gap_correct(alignments, slices):
     """
