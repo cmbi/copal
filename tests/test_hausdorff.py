@@ -34,17 +34,6 @@ class TestHausdorff(unittest.TestCase):
         for ix,series in enumerate(self.array1):
             self.assertEqual(hausdorff.hausdorff(series,self.array2[ix]),1)
 
-   
-    def test_new_hausdorff(self):
-        self.assertEqual(hausdorff.new_hausdorff(self.list1,self.list2),
-                        4799.000104188372)
-        self.assertEqual(hausdorff.new_hausdorff(self.list3,self.list4),
-                        11.045361017187261)
-
-        for ix,series in enumerate(self.array1):
-            self.assertEqual(hausdorff.new_hausdorff(series,self.array2[ix]),1)
-
-
 if __name__ == "__main__":
     unittest.main()
 
