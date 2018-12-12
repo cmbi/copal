@@ -8,53 +8,56 @@ Copyright (C) 2018  Radboud universitair medisch centrum
 
 # import statements
 import math
+import numpy as np
 
 # functions
-def convert_set(set):
-    """converts 1dimensional series to two dimensional data using list index"""
-    new_set = []
-    for i in range(len(set)):
-        new_set.append((i,set[i]))
-    return new_set
-    
-def distance(point, target):
-    """ returns absolute distance between 2 points using (x,y) coordinates"""
-    xdist = abs(point[0]-target[0])
-    ydist = abs(point[1]-target[1])
-    squareddist = xdist**2 + ydist**2
-    dist = math.sqrt(squareddist)
-    return dist
+def convert_set(series):
+    """converts 1dimensional series to two dimensional np array """
+    two_D_series = [[ix,val] for ix,val in enumerate(series)]
+    two_D_array = np.array(two_D_series)
+    return two_D_array
 
-def hausdorff(set1, set2):
+def min_euclid(point, series):
     """
-    computes hausdorff distance between two sets of points
-    
-    Keyword arguments:
-        set1/2 -- list of numeric values
+    determine min euclid dist between point and every point of series
+
+    Args:
+        point: np array of length 2 with x,y coords
+        series: 2D np array of shape(n,2) with x,y coords for each point
     Returns:
-        hausdorff distance between sets, based on euclidian distance between sets.
+        closest: minimum euclid dist between point and series
     """
-    set1 = convert_set(set1)                    # convert 1D series into 2D points
-    set2 = convert_set(set2)
-    hausdorffs = []  
-    for set in [(set1, set2), (set2, set1)]:                      # loop through 2 hausdorf directions: h(1,2) and h(2,1), store dist in hausdorffs
-        nearest_distances = []
-        for point in set[0]:    # loop through all points of set1
-            distances = []  
-            #determine distance from point to all targets, store in distances
-            for target in set[1]:       
-                distances.append(distance(point, target))
-            #select lowest distance --> closest distance from point to set2, store in nearest
-            nearest_distances.append(min(distances))
-        hausdorffs.append(max(nearest_distances))       # select max hausdorff distance (which is the hausdorff distance between set1 and set2)
-    return max(hausdorffs)
+    diff = np.square(np.abs(series - point))
+    summed = np.sum(diff, axis = 1)
+    result = np.sqrt(summed)
+    closest = np.min(result)
+    return closest
+
+def hausdorff_one_sided(template, target):
+    """
+    determine one-sided hausdorff distance from template to target
+    """
+    minima = np.apply_along_axis(min_euclid,1,template,target)
+    max_min = minima.max()
+    return max_min
+
+def hausdorff(left, right):
+    """
+    determine hausdorff distance between two (list-like) series 
+    """
+    left = convert_set(left)
+    right = convert_set(right)
+    first_side = hausdorff_one_sided(left, right)
+    second_side = hausdorff_one_sided(right,left)
+    hausdorff = max(first_side,second_side)
+    return hausdorff
 
 def square_series(slices, norm_factor):
     """
     normalises list of protein intensity values per sample
     
-    sets maximum value across all samples to the length of the series, creating a square 
-    2D plane in which to calculate hausdorff distances
+    sets maximum value across samples to a factor of the series length,
+    creating a 2D plane in which to calculate hausdorff distances
     Keyword arguments:
         slices -- list, containing list of numeric values per sample
         norm_factor (float): factor that determines ratio between plain height and width
@@ -74,3 +77,9 @@ def square_series(slices, norm_factor):
         return new_slices
     else:
         return slices
+
+def new_square_series():
+    pass
+
+if __name__ == "__main__":
+    pass
