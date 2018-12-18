@@ -548,7 +548,7 @@ def output_options_frame(master):
     hausd_factor_entry = ttk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 7, column = 3, sticky = tk.N)
 
     # GSEA check button and column entry
-    GSEA_check = tk.Checkbutton(master, text = "provide rank ordered protein list", variable = gsea_check).grid(columnspan = 2, sticky = tk.W, pady = 10)
+    GSEA_check = ttk.Checkbutton(master, text = "provide rank ordered protein list", variable = gsea_check).grid(columnspan = 2, sticky = tk.W, pady = 10)
     GSEA_col_label = tk.Label(master, text = "ranked list identifier column:").grid(row = 8, column = 2, sticky = tk.E)
     GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W)
 
@@ -585,6 +585,9 @@ def first_input_frame():
     first_input_buttons(first_frame)
 
 if __name__ == "__main__":
+
+    print('Loading COPAL..')
+
     # initialise root
     root = tk.Tk()
     root.wm_title("COPAL")
@@ -592,14 +595,17 @@ if __name__ == "__main__":
     #root.resizable(0,0)        # prevents window from being resized
 
     # try to set application icon (does not work on all platforms)
-    try:
-        root.iconbitmap(os.path.join(os.getcwd(),'static/Copal.ico'))
-    except:
-        pass
 
-    # initialize tkinter variables
+    try:
+        root.iconbitmap(os.path.join(os.getcwd(),'copal/static/Copal.ico'))
+    except Exception as e: 
+        print('failed to load copal icon')
+        print(e)        
+
+    # initialize tkinter variables  
     job_name = tk.StringVar()
     file_name = tk.StringVar()
+
     skip_rows = tk.IntVar()
     file_type = tk.StringVar()
     ident_col = tk.StringVar()
