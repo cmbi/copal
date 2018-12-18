@@ -19,6 +19,10 @@ To run the packaged tool with GUI, execute the executable single file on your pr
 * xlsxwriter
 * xlrd
 
+requirements.txt: can be used to create (conda) virtual environment with all necessary requirements
+
+example command:  conda create --name <env> --file requirements.txt
+
 ## Test Example
 
 *test data:*
