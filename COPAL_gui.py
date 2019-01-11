@@ -527,7 +527,7 @@ def input_frame(master):
     get_file_button.grid(row = 1, column = 4, padx = 4, sticky = tk.W)
 
     # choose filetype dropdown menu
-    file_type_dropdown = ttk.OptionMenu(master, file_type,"excel", "csv del ';' dec ','",
+    file_type_dropdown = ttk.OptionMenu(master, file_type,"excel","excel", "csv del ';' dec ','",
                                          "csv del ',' dec '.'", "tsv del '\\t' dec ','",
                                          "tsv del '\\t' dec '.'")
     file_type_dropdown.grid(row = 1, column = 5, sticky = tk.EW)
@@ -621,7 +621,7 @@ def output_options_frame(master):
 
     # data normalisation drop-down
     normalisation_label = tk.Label(master, text = "data normalisation:").grid(sticky = tk.E, pady = 5)
-    normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None", "Using all Proteins", "Using subset from Column", "Using subset from File")
+    normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None","None", "Using all Proteins", "Using subset from Column", "Using subset from File")
     normalisation_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
 
     # norm_col label and entry
