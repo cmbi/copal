@@ -6,16 +6,18 @@ Copyright (C) 2018  Radboud universitair medisch centrum
     for full notice, reference readme.md
 """
 
-# import statements
+# import external packages
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 from tkinter import messagebox
 import os
 import threading
+from pandas.errors import ParserError
 
 #import copal
 import copal
+from copal.dataprep import multi_dataload
 
 # ---------- INPUT PROCESSING AND HELPER FUNCTIONS ---------- #
 
@@ -70,6 +72,18 @@ def get_normalisation(normtype, normcol, normfile):
         normcol = None
         normfile = normfile
     return (norm_check, normcol, normfile)
+
+def clear_last_input():
+    added_samples = len(input['samplecolumns'][-1])
+    print('clearing wrong input..')
+    print('number of added samples: {}'.format(added_samples))
+    del input['identifier'][-1]
+    del input['filename'][-1]
+    del input['sheetname'][-1]
+    del input['skiprows'][-1]
+    del input['input_type'][-1]
+    del input['samplecolumns'][-1]
+    del input['samplenames'][-1*added_samples:]
 
 def save_input_settings():
     """ saves first input file settings to global input variables """
@@ -186,6 +200,93 @@ def check_input():
         return False
 
     return True
+
+def check_input_data(input):
+    """
+    check if input data is valid and matches input specs
+    """
+    identifier = input['identifier'][-1]
+    filename = input['filename'][-1]
+    sheet = input['sheetname'][-1]
+    skip_rows = input['skiprows'][-1]
+    file_type = input['input_type'][-1]
+    samplecolumns = input['samplecolumns'][-1]
+    
+    # try to load data
+    try:
+        data = multi_dataload(identifier, filename, sheet, skip_rows, file_type)
+    except FileNotFoundError as error:
+        warn_msg = "file not found! check input file name and path"
+        input_status_var.set(warn_msg)
+        messagebox.showwarning("input error", warn_msg)
+        clear_last_input()
+        return False
+
+    except ParserError as error:
+        warn_msg = "problem parsing input file. is file type correct? error: {}".format(error)
+        input_status_var.set('loading data failed. check file type')
+        messagebox.showwarning("input error", warn_msg)
+        clear_last_input()
+        return False
+
+    except ValueError as error:
+        warn_msg = "something went wrong with loading data file. please check file input details. error: {}".format(error)
+        input_status_var.set("loading data failed. please check input details.")
+        messagebox.showwarning("input error", warn_msg)
+        clear_last_input()
+        return False
+
+    except Exception as error:
+        warn_msg = "something went wrong with loading data. check input details. error: {}".format(error)
+        input_status_var.set("problem loading data. check input details")
+        messagebox.showwarning("input error",warn_msg)
+        clear_last_input()
+        return False
+
+    # check if samplecolumns exist and check sample length
+    for col_pair in samplecolumns:
+        if not col_pair[0] in data.columns:
+            warn_msg = "start column header not in dataset: {}. check input".format(col_pair[0])
+            input_status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
+            clear_last_input()
+            return False
+        if not col_pair[1] in data.columns:
+            warn_msg = "end column header not in dataset: {}. check input".format(col_pair[1])
+            input_status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
+            clear_last_input()
+            return False
+
+        # check for samples with 0 or 1 slices
+        try:
+            sample_data = data.loc[:,col_pair[0]:col_pair[1]]
+        except Exception as error:
+            warn_msg = "sample could not be extracted from data. error: {}".format(error)
+            "please check input"
+            input_status_var.set("problem extracting sample from data. check input")
+            messagebox.showwarning("input error",warn_msg)
+            clear_last_input()
+            return False            
+
+        if sample_data.shape[1] < 2:
+            warn_msg = "found sample with 0 or 1 columns: {}:{}. ".format(col_pair[0],col_pair[1])
+            "Please check input"
+            input_status_var.set(warn_msg)
+            messagebox.showwarning("input error", warn_msg)
+            clear_last_input()
+            return False
+
+        # check for nan values in sample
+        if sample_data.isnull().values.any():
+            warn_msg = "sample contains missing (nan) values: {}:{}. ".format(col_pair[0],col_pair[1])
+            "please check input"
+            input_status_var.set(warn_msg)
+            messagebox.showwarning("input error", warn_msg)
+            clear_last_input()
+            return False
+    
+    return True 
 
 def check_output():
     """
@@ -326,10 +427,12 @@ def save_proceed_handler(event = None):
     """
     if check_input():
         save_input_settings()
-        output_frame = tk.Frame(root)
-        output_frame.grid(row = 0, column = 0, sticky = "news")
-        output_options_frame(output_frame)
-        output_frame.tkraise()
+        if check_input_data(input):
+            print_input()
+            output_frame = tk.Frame(root)
+            output_frame.grid(row = 0, column = 0, sticky = "news")
+            output_options_frame(output_frame)
+            output_frame.tkraise()
 
 def append_proceed_handler(event = None):
     """
@@ -340,11 +443,12 @@ def append_proceed_handler(event = None):
     """
     if check_input():
         append_extra_input()
-        print_input()
-        output_frame = tk.Frame(root)
-        output_frame.grid(row = 0, column = 0, sticky = "news")
-        output_options_frame(output_frame)
-        output_frame.tkraise()
+        if check_input_data(input):
+            print_input()
+            output_frame = tk.Frame(root)
+            output_frame.grid(row = 0, column = 0, sticky = "news")
+            output_options_frame(output_frame)
+            output_frame.tkraise()
 
 def save_extra_input_handler(event = None):
     """
@@ -355,12 +459,13 @@ def save_extra_input_handler(event = None):
     """
     if check_input():
         save_input_settings()
-        clear_input_vars()
-        extra_frame = tk.Frame(root)
-        extra_frame.grid(row = 0, column = 0, sticky = "news")
-        input_frame(extra_frame)
-        extra_input_buttons(extra_frame)
-        extra_frame.tkraise()
+        if check_input_data(input):
+            clear_input_vars()
+            extra_frame = tk.Frame(root)
+            extra_frame.grid(row = 0, column = 0, sticky = "news")
+            input_frame(extra_frame)
+            extra_input_buttons(extra_frame)
+            extra_frame.tkraise()
 
 def append_extra_input_handler(event = None):
     """
@@ -371,12 +476,13 @@ def append_extra_input_handler(event = None):
     """
     if check_input():
         append_extra_input()
-        clear_input_vars()
-        extra_frame = tk.Frame(root)
-        extra_frame.grid(row = 0, column = 0, sticky = "news")
-        input_frame(extra_frame)
-        extra_input_buttons(extra_frame)
-        extra_frame.tkraise()
+        if check_input_data(input):
+            clear_input_vars()
+            extra_frame = tk.Frame(root)
+            extra_frame.grid(row = 0, column = 0, sticky = "news")
+            input_frame(extra_frame)
+            extra_input_buttons(extra_frame)
+            extra_frame.tkraise()
 
 def save_output_and_run_handler(event = None):
     """
