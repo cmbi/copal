@@ -74,6 +74,9 @@ def get_normalisation(normtype, normcol, normfile):
     return (norm_check, normcol, normfile)
 
 def clear_last_input():
+    """
+    removes last added set of input specs from global input dict 
+    """
     added_samples = len(input['samplecolumns'][-1])
     print('clearing wrong input..')
     print('number of added samples: {}'.format(added_samples))
@@ -201,7 +204,7 @@ def check_input():
 
     return True
 
-def check_input_data(input):
+def check_input_data():
     """
     check if input data is valid and matches input specs
     """
@@ -243,15 +246,16 @@ def check_input_data(input):
         clear_last_input()
         return False
 
-    # check if samplecolumns exist and check sample length
+    # check if samplecolumns exist
+    dataset_columns = list(data.columns)
     for col_pair in samplecolumns:
-        if not col_pair[0] in data.columns:
+        if not col_pair[0] in dataset_columns:
             warn_msg = "start column header not in dataset: {}. check input".format(col_pair[0])
             input_status_var.set(warn_msg)
             messagebox.showwarning("input error",warn_msg)
             clear_last_input()
             return False
-        if not col_pair[1] in data.columns:
+        if not col_pair[1] in dataset_columns:
             warn_msg = "end column header not in dataset: {}. check input".format(col_pair[1])
             input_status_var.set(warn_msg)
             messagebox.showwarning("input error",warn_msg)
@@ -263,7 +267,6 @@ def check_input_data(input):
             sample_data = data.loc[:,col_pair[0]:col_pair[1]]
         except Exception as error:
             warn_msg = "sample could not be extracted from data. error: {}".format(error)
-            "please check input"
             input_status_var.set("problem extracting sample from data. check input")
             messagebox.showwarning("input error",warn_msg)
             clear_last_input()
@@ -271,7 +274,6 @@ def check_input_data(input):
 
         if sample_data.shape[1] < 2:
             warn_msg = "found sample with 0 or 1 columns: {}:{}. ".format(col_pair[0],col_pair[1])
-            "Please check input"
             input_status_var.set(warn_msg)
             messagebox.showwarning("input error", warn_msg)
             clear_last_input()
@@ -280,12 +282,13 @@ def check_input_data(input):
         # check for nan values in sample
         if sample_data.isnull().values.any():
             warn_msg = "sample contains missing (nan) values: {}:{}. ".format(col_pair[0],col_pair[1])
-            "please check input"
             input_status_var.set(warn_msg)
             messagebox.showwarning("input error", warn_msg)
             clear_last_input()
             return False
     
+    # store columns of each dataset to check outputspecs
+    input['dataset_columns'].append(dataset_columns)
     return True 
 
 def check_output():
@@ -346,6 +349,42 @@ def check_output():
 
     return True
 
+def check_output_data():
+    """
+    checks if output data is valid
+    """
+    input_columnsets = input['dataset_columns']
+    normcol = input['normcol']
+    normfile = input['normfile']
+    gseacol = input['GSEA_rank_column']
+
+    # check normcol 
+    if normcol:
+        for dataset in input_columnsets:
+            if not normcol in dataset:
+                warn_msg = "normalisation column header not present in one of the input datasets!"
+                status_var.set(warn_msg)
+                messagebox.showwarning("input error",warn_msg)
+                return False
+    # check gsea_col
+    if gseacol:
+        for dataset in input_columnsets:
+            if not gseacol in dataset:
+                warn_msg = "gsea column header not present in one of the input datasets!"
+                status_var.set(warn_msg)
+                messagebox.showwarning("input error",warn_msg)
+                return False
+    
+    # check normfile
+    if normfile:
+        if not os.path.isfile(normfile):
+            warn_msg = "normfile does not exist! check input."
+            status_var.set(warn_msg)
+            messagebox.showwarning("input error",warn_msg)
+            return False
+    
+    return True
+
 def print_input():
     """prints out global input variables to stdout"""
     print("file name: ", input['filename'])
@@ -388,6 +427,8 @@ def run_analysis():
 
 def back_to_input_handler(event = None):
     """clears input and goes back to first GUI frame"""
+    # clear dataset columns when re-entering input
+    input['dataset_columns'] = []
     clear_input_vars()
     first_input_frame()
 
@@ -427,7 +468,13 @@ def save_proceed_handler(event = None):
     """
     if check_input():
         save_input_settings()
-        if check_input_data(input):
+        if check_input_data():
+            if len(input['samplenames']) < 2:
+                warn_msg = ('only 1 sample specified! need at least two samples for alignment. '
+                                     'add another sample from this file or add another file')
+                status_var.set(warn_msg)
+                messagebox.showwarning("input error",warn_msg)
+                return 
             print_input()
             output_frame = tk.Frame(root)
             output_frame.grid(row = 0, column = 0, sticky = "news")
@@ -443,7 +490,7 @@ def append_proceed_handler(event = None):
     """
     if check_input():
         append_extra_input()
-        if check_input_data(input):
+        if check_input_data():
             print_input()
             output_frame = tk.Frame(root)
             output_frame.grid(row = 0, column = 0, sticky = "news")
@@ -459,7 +506,7 @@ def save_extra_input_handler(event = None):
     """
     if check_input():
         save_input_settings()
-        if check_input_data(input):
+        if check_input_data():
             clear_input_vars()
             extra_frame = tk.Frame(root)
             extra_frame.grid(row = 0, column = 0, sticky = "news")
@@ -476,7 +523,7 @@ def append_extra_input_handler(event = None):
     """
     if check_input():
         append_extra_input()
-        if check_input_data(input):
+        if check_input_data():
             clear_input_vars()
             extra_frame = tk.Frame(root)
             extra_frame.grid(row = 0, column = 0, sticky = "news")
@@ -499,14 +546,15 @@ def save_output_and_run_handler(event = None):
             root.update_idletasks()
             return
 
-        status_var.set("Running analysis. This might take a while...")
-        root.update_idletasks()                # ensures the status label gets updated in a timely fashion
         save_output_settings()
-        print_input()
-        print_output()
-        analysis_thread = threading.Thread(target = run_analysis)
-        analysis_thread.daemon = True
-        analysis_thread.start()
+        if check_output_data():
+            status_var.set("Running analysis. This might take a while...")
+            root.update_idletasks()                # ensures the status label gets updated in a timely fashion
+            print_input()
+            print_output()
+            analysis_thread = threading.Thread(target = run_analysis)
+            analysis_thread.daemon = True
+            analysis_thread.start()
 
 # ---------- GUI WIDGET CREATING FUNCTIONS ---------- #
 def input_frame(master):
@@ -527,7 +575,7 @@ def input_frame(master):
     get_file_button.grid(row = 1, column = 4, padx = 4, sticky = tk.W)
 
     # choose filetype dropdown menu
-    file_type_dropdown = ttk.OptionMenu(master, file_type,"excel","excel", "csv del ';' dec ','",
+    file_type_dropdown = ttk.OptionMenu(master, file_type,"csv del ',' dec '.'","excel", "csv del ';' dec ','",
                                          "csv del ',' dec '.'", "tsv del '\\t' dec ','",
                                          "tsv del '\\t' dec '.'")
     file_type_dropdown.grid(row = 1, column = 5, sticky = tk.EW)
@@ -701,7 +749,6 @@ if __name__ == "__main__":
     #root.resizable(0,0)        # prevents window from being resized
 
     # try to set application icon (does not work on all platforms)
-
     try:
         root.iconbitmap(os.path.join(os.getcwd(),'copal/static/Copal.ico'))
     except Exception as e: 
@@ -730,6 +777,9 @@ if __name__ == "__main__":
 
     # initialize global dictionary containing input for analysis
     input = {}
+    # create empty list. to enter column-list of each dataset into.
+    # used to check if output frame specs match input data
+    input['dataset_columns'] = []
 
     # set variable default values
     file_type.set("excel")
