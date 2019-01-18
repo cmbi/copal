@@ -8,6 +8,7 @@ Copyright (C) 2018  Radboud universitair medisch centrum
 
 # import statements
 from . import timewarp
+import numpy as np
 
 # functions
 def create_sample_entries(totaldata,samplelengths):
@@ -25,7 +26,6 @@ def create_sample_entries(totaldata,samplelengths):
     for sample in range(len(totaldata)):
         entries[str(sample+1)] = {str(sample+1):range(samplelengths[sample])}
     return entries
-
 
 def pairwise_timewarp(totaldata,samplelengths,localdict):
     """
@@ -141,3 +141,100 @@ def datawarp(data, alignment):
         warpeddata.append(newsample)                          # add new sample to warpeddata
         samplenum += 1
     return warpeddata
+
+def interpolate_sample(sample,alignment):
+    """
+    warp sample, using interpolation to fill gaps
+    """
+    dimensions = (sample.shape[0],len(alignment))
+    warped_data = np.full(dimensions, np.nan)
+    alignment_iterator = enumerate(alignment)
+    for ix,value in alignment_iterator:
+        if value != None:
+            warped_data[:,ix] = sample[:,value]
+        else:
+            gaps = 1
+            # look into the future for any extra Nones
+            for value in alignment[ix+1:]:
+                if value == None:
+                    gaps += 1
+                else:
+                    break
+
+            # error if sample starts with a gap
+            if ix == 0:
+                raise ValueError("sample starts with gap. "
+                "Option not implemented as this normally can't happen")
+
+            # get adjacent values
+            left_adj = sample[:,alignment[ix-1]]
+            try:
+                right_adj = sample[:,alignment[ix+gaps]]
+        
+            # catch and handle case where gaps last till end of sample
+            except IndexError:
+                fill_values = left_adj.repeat(gaps).reshape(dimensions[0],gaps)
+                warped_data[:,ix:] = fill_values
+                break
+            except Exception:
+                raise ValueError('something else went wrong with right_adj..')
+
+            # determine step sizes
+            diff = right_adj - left_adj
+            stepsizes = diff/(gaps + 1)
+
+            # get values to fill gaps
+            gap_array = np.arange(1,gaps+1)
+            to_add = np.outer(gap_array, stepsizes)
+            fill_values = (to_add + left_adj).transpose()
+            warped_data[:,ix:ix+gaps] = fill_values
+
+            # skip iterations over gap indexes that have been handled            
+            for i in range(gaps-1):
+                next(alignment_iterator)
+    
+    return warped_data
+
+def find_gaps(alignment):
+    """
+    """
+    previous = None
+    with_gaps = []
+    for value in alignment:
+        if value == previous:
+            with_gaps.append(None)
+        else:
+            with_gaps.append(value)
+        previous = value
+    return with_gaps
+
+def interpolation_warp(data, alignment):
+    """
+    """
+    warpeddata = []
+    for ix,sample in enumerate(data):
+        sample_array = np.array(sample).transpose()
+        sample_alignment = alignment[str(ix+1)]
+        sample_gaps = find_gaps(sample_alignment)
+        warped_sample_array =interpolate_sample(sample_array,sample_gaps)
+        warped_sample = warped_sample_array.transpose().tolist()
+        warpeddata.append(warped_sample)
+    return warpeddata
+
+if __name__ == "__main__":
+    # get test sample
+    sample1 = [[0,3,8,1],[1,3,7,1],[2,1,6,1],[6,1,5,1],[7,1,4,1]]
+    sample2 = [[3,4,6,0],[8,8,6,0],[4,3,8,0],[3,7,6,0],[7,2,0,0]]
+    test_data = [sample1,sample2]
+    test_alignment = {
+        '1':[0,1,2,2,3,3,4,4],
+        '2':[0,1,1,2,2,3,3,4],
+                }
+
+    warped_data = interpolation_warp(test_data, test_alignment)
+    
+    print(warped_data[0])
+    print(warped_data[1])
+
+    print(np.array(warped_data[0]).transpose())
+    print(np.array(warped_data[1]).transpose())

@@ -127,7 +127,9 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
 
     # WARP DATA USING FINAL ALIGNMENT
     print( "warping data using final multiple alignment...")
-    warpeddata = msa_warp.datawarp(modifieddata, final_alignment)
+    # warpeddata = msa_warp.datawarp(modifieddata, final_alignment)
+    warpeddata = msa_warp.interpolation_warp(modifieddata,final_alignment)
+
     #transform warped data to pandas dataframe
     warpeddataframe = datatoexcel.datatoframe(warpeddata, input['samplenames'], align_lengths)
 
