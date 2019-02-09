@@ -1,19 +1,19 @@
 # COPAL -- COmplexome Profile ALignment
 ## Synopsis
 
-COPAL is a tool that aligns complexome profile samples using an adaptation on the dynamic time warping algorithm.
-After alignment it can quantify differences in protein migration patterns between sample groups using the hausdorff effect size
+COPAL is a tool that aligns complexome profiling samples using a multi-dimensional adaptation of the dynamic time warping algorithm.
+After alignment it can quantify differences in protein migration patterns between sample groups using the hausdorff effect size.
 
 ## Installation
 
-COPAL can be installed by cloning this repository.
-To run the tool from python, run the maindtw.py module.
-To run the tool with the GUI wrapper from python, run the gui.py module.
-To run the packaged tool with GUI, execute the executable single file on your preferred platform (Windows, Linux or Mac).
+COPAL source code can be accessed by cloning this repository.
+To run the tool with python, run the copal/COPAL_main.py module.
+To run the tool with the Graphical user interface (GUI) wrapper with python, run the COPAL_gui.py module.
+To use the packaged tool (with GUI), download the [latest release](https://github.com/cmbi/copal/releases), and run the executable single file (Windows or Mac).
 
 ### requirements
 
-* python 3  (for python2 switch to py2_version branch)
+* python 3  (for python2.7 switch to py2_version branch)
 * numpy
 * pandas
 * xlsxwriter
@@ -86,3 +86,9 @@ For documentation on how to run an analysis using the GUI, refer to the user gui
 Prof. Dr. Martijn Huynen
 
 email: Martijn.Huijnen@radboudumc.nl
+
+## Citing COPAL
+
+Van Strien, J., Guerrero-Castillo, S., Chatzispyrou, I. A., Houtkooper, R. H., Brandt, U., & Huynen, M. A. 
+[COmplexome Profiling ALignment (COPAL) reveals remodeling of mitochondrial protein complexes in Barth syndrome.](https://doi-org.ru.idm.oclc.org/10.1093/bioinformatics/btz025)
+Bioinformatics, 2019, 1–9
