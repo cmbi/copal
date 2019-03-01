@@ -128,6 +128,7 @@ def save_output_settings():
     """saves output settings to global variables"""
     global input
     input['analysis_name'] = job_name.get()
+    input['warp_method'] = warp_method.get()
     normalisation_parameters = get_normalisation(normalisation_type.get(), norm_col.get(), norm_file.get())
     input['norm_check'] = normalisation_parameters[0]
     input['normcol'] = normalisation_parameters[1]
@@ -667,62 +668,67 @@ def output_options_frame(master):
     choose_folder_button.bind("<Button-1>", get_output_folder)
     choose_folder_button.grid(row = 2, column = 2, sticky = tk.W)
 
+    # choose warping type drop-down
+    warptype_label = tk.Label(master, text = 'warping type:').grid(sticky = tk.E, pady = 5)
+    warptype_dropdown = ttk.OptionMenu(master, warp_method, "interpolate","interpolate","repeat")
+    warptype_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
+
     # data normalisation drop-down
     normalisation_label = tk.Label(master, text = "data normalisation:").grid(sticky = tk.E, pady = 5)
     normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None","None", "Using all Proteins", "Using subset from Column", "Using subset from File")
-    normalisation_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
+    normalisation_dropdown.grid(row = 4, column = 1, columnspan = 2, sticky = tk.EW)
 
     # norm_col label and entry
     norm_col_label = tk.Label(master, text = "if from column:").grid(sticky = tk.E)
-    norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 4, column = 1,sticky=tk.W)
+    norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 5, column = 1,sticky=tk.W)
 
     # norm_file label and entry
-    norm_file_label = tk.Label(master, text = "if from file:").grid(row = 5, sticky = tk.E)
-    norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 5, column = 1, sticky = tk.W)
+    norm_file_label = tk.Label(master, text = "if from file:").grid(row = 6, sticky = tk.E)
+    norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 6, column = 1, sticky = tk.W)
 
     # choose norm_file button
     norm_file_button = ttk.Button(master, text = "Choose file")
     norm_file_button.bind("<Button-1>", get_norm_file)
-    norm_file_button.grid(row = 5, column = 2, padx = 4, sticky = tk.W)
+    norm_file_button.grid(row = 6, column = 2, padx = 4, sticky = tk.W)
 
     # score analysis check button
     score_analysis_check = ttk.Checkbutton(master, text = "perform score analysis", variable = score_check)
     score_analysis_check.grid(sticky = tk.W)        # create checkbutton, set text, assign to boolVar variable
 
     # score analysis group text boxes
-    group1_label = tk.Label(master, text = "group 1 samples").grid(row = 6, column = 1)
-    group2_label = tk.Label(master, text = "group 2 samples").grid(row = 6, column = 2)
+    group1_label = tk.Label(master, text = "group 1 samples").grid(row = 7, column = 1)
+    group2_label = tk.Label(master, text = "group 2 samples").grid(row = 7, column = 2)
     group1_text = tk.Text(master, height = 10, width = 25, background = "white", wrap = tk.NONE,cursor = 'arrow')
     group1_text.grid(column = 1)
     group2_text = tk.Text(master, height = 10, width = 25, background = "white", wrap = tk.NONE,cursor='arrow')
-    group2_text.grid(row = 7, column = 2)
+    group2_text.grid(row = 8, column = 2)
 
     # hausdorff factor label and entry
-    hausd_factor_label = tk.Label(master, text = 'hausdorff factor:').grid(row = 6, column = 3)
-    hausd_factor_entry = ttk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 7, column = 3, sticky = tk.N)
+    hausd_factor_label = tk.Label(master, text = 'hausdorff factor:').grid(row = 7, column = 3)
+    hausd_factor_entry = ttk.Entry(master, textvariable = hausd_factor, width = 10).grid(row = 8, column = 3, sticky = tk.N)
 
     # GSEA check button and column entry
     GSEA_check = ttk.Checkbutton(master, text = "provide rank ordered protein list", variable = gsea_check).grid(columnspan = 2, sticky = tk.W, pady = 10)
-    GSEA_col_label = tk.Label(master, text = "ranked list identifier column:").grid(row = 8, column = 2, sticky = tk.E)
-    GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 8, column = 3, sticky = tk.W)
+    GSEA_col_label = tk.Label(master, text = "ranked list identifier column:").grid(row = 9, column = 2, sticky = tk.E)
+    GSEA_col_entry = ttk.Entry(master, textvariable = gsea_col, width = 25).grid(row = 9, column = 3, sticky = tk.W)
 
     # status label
-    status_label = tk.Label(master, textvariable = status_var).grid(row = 9, column = 1, columnspan = 4)
+    status_label = tk.Label(master, textvariable = status_var).grid(row = 10, column = 1, columnspan = 4)
 
     # save and run button
     save_settings_button = ttk.Button(master, text = "save and run")
     save_settings_button.bind("<Button-1>", save_output_and_run_handler)
-    save_settings_button.grid(row = 9, column = 5, sticky = tk.E)
+    save_settings_button.grid(row = 10, column = 5, sticky = tk.E)
 
     # quit application button
     quit_app_button = ttk.Button(master, text = "quit  ")
     quit_app_button.bind("<Button-1>", quit_app)
-    quit_app_button.grid(row = 9, column = 0, sticky = tk.W,pady=5,padx=5)
+    quit_app_button.grid(row = 10, column = 0, sticky = tk.W,pady=5,padx=5)
 
     # back to input button
     back_to_input_button = ttk.Button(master, text = "back to start")
     back_to_input_button.bind("<Button-1>", back_to_input_handler)
-    back_to_input_button.grid(row = 9, column = 1, sticky = tk.W,pady=5,padx=5)
+    back_to_input_button.grid(row = 10, column = 1, sticky = tk.W,pady=5,padx=5)
 
     # sample names message box
     sample_names_message = "Sample names:\n\n" + '\n'.join(input['samplenames'])
@@ -764,6 +770,7 @@ if __name__ == "__main__":
     ident_col = tk.StringVar()
     sheet_name = tk.StringVar()
     normalisation_type = tk.StringVar()
+    warp_method = tk.StringVar()
     norm_col = tk.StringVar()
     norm_file = tk.StringVar()
     score_check = tk.BooleanVar()

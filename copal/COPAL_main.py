@@ -127,8 +127,12 @@ def complexome_alignment(template_df, samplelengths, modifieddata, input):
 
     # WARP DATA USING FINAL ALIGNMENT
     print( "warping data using final multiple alignment...")
-    # warpeddata = msa_warp.datawarp(modifieddata, final_alignment)
-    warpeddata = msa_warp.interpolation_warp(modifieddata,final_alignment)
+    if input['warp_method'] == 'repeat':
+        warpeddata = msa_warp.datawarp(modifieddata, final_alignment)
+    elif input['warp_method'] == 'interpolate':
+        warpeddata = msa_warp.interpolation_warp(modifieddata,final_alignment)
+    else:
+        raise ValueError('warp method not recognized!: {}'.format(input['warp_method']))
 
     #transform warped data to pandas dataframe
     warpeddataframe = datatoexcel.datatoframe(warpeddata, input['samplenames'], align_lengths)
@@ -294,7 +298,6 @@ def main(input = input):
 
     output_results(input, output)
 
-
 if __name__ == "__main__":
 
     # test data paths
@@ -320,6 +323,7 @@ if __name__ == "__main__":
     input['GSEA_rank_column'] = 'Gene Symbol'
     input['groups'] = [[1, 2, 3, 4, 5], [6, 7, 8, 9]]
     input['hausd_factor'] = 1.0
+    input['warp_method'] = 'interpolate'
 
     # main function call, starting COPAL analysis
     main(input = input)

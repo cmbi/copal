@@ -210,6 +210,9 @@ def find_gaps(alignment):
 
 def interpolation_warp(data, alignment):
     """
+    warps data using (final) alignment
+
+    fills gaps by interpolating based on values in adjacent slices
     """
     warpeddata = []
     for ix,sample in enumerate(data):
