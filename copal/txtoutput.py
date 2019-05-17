@@ -113,36 +113,37 @@ def text_output(input, output, align_info, output_path):
     else:
         put("no normalisation performed.", txtfile)
     
-    # sample and alignment length info
-    put("samplelengths: " +  str(output['samplelengths']), txtfile)
-    put("Length of final alignment: " + str(output['final_align_length']), txtfile)
+    if input['align_check']:
+        # sample and alignment length info
+        put("samplelengths: " +  str(output['samplelengths']), txtfile)
+        put("Length of final alignment: " + str(output['final_align_length']), txtfile)
 
-    put("Samples used:\n#  sample name", txtfile)
-    for i in range(len(input['samplenames'])):
-        put("%d  %s"%(i+1,input['samplenames'][i]), txtfile)
+        put("Samples used:\n#  sample name", txtfile)
+        for i in range(len(input['samplenames'])):
+            put("%d  %s"%(i+1,input['samplenames'][i]), txtfile)
 
-    # clustering info
-    paircostkeys = sorted(output['pairwisecosts'].keys())
-    put("\npairwise clustering results (from low to high cost):", txtfile)
-    for key in paircostkeys:
-        put("pair: " + str(output['pairwisecosts'][key]) + "   cost: " + str(key), txtfile) 
+        # clustering info
+        paircostkeys = sorted(output['pairwisecosts'].keys())
+        put("\npairwise clustering results (from low to high cost):", txtfile)
+        for key in paircostkeys:
+            put("pair: " + str(output['pairwisecosts'][key]) + "   cost: " + str(key), txtfile) 
 
-    put("\npairwise matches ordered by cost scores from low to high:", txtfile)
-    sortedpairs = []
-    for i in paircostkeys:
-        sortedpairs.append(output['pairwisecosts'][i])
-    put(str(sortedpairs), txtfile)  
-    put("", txtfile)
-    put("Alignment order: " +  str(output['multiple_alignment_order']), txtfile)
-    put("", txtfile)
-    
-    # gap location info
-    put("visualision of gap locations of final alignment: ", txtfile)
-    put("-----------------------------------------------------------\n", txtfile)
-    show_align(output['final_alignment'], txtfile)
-    put("\n-----------------------------------------------------------", txtfile)
-    if input['hausdorff_scoring']:
-        put("groups used for combined scores: " +str(input['groups']), txtfile)
+        put("\npairwise matches ordered by cost scores from low to high:", txtfile)
+        sortedpairs = []
+        for i in paircostkeys:
+            sortedpairs.append(output['pairwisecosts'][i])
+        put(str(sortedpairs), txtfile)  
+        put("", txtfile)
+        put("Alignment order: " +  str(output['multiple_alignment_order']), txtfile)
+        put("", txtfile)
+        
+        # gap location info
+        put("visualision of gap locations of final alignment: ", txtfile)
+        put("-----------------------------------------------------------\n", txtfile)
+        show_align(output['final_alignment'], txtfile)
+        put("\n-----------------------------------------------------------", txtfile)
+        if input['hausdorff_scoring']:
+            put("groups used for combined scores: " +str(input['groups']), txtfile)
 
     # close file and return to starting directory after storing file in results folder
     txtfile.close()

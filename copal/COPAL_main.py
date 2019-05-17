@@ -234,6 +234,44 @@ def output_results(input, output):
     # PROVIDE ALIGNMENT INFO TEXT OUTPUT (to stdout and .txt file)
     out.text_output(input, output, align_info, output_path)
 
+def insert_normalised_data(template_df, samplelengths, modifieddata, input):
+    """alternative function to complexome_alignment if align_check=False"""
+    #transform normalised data to pandas dataframe
+    normeddataframe = datatoexcel.datatoframe(modifieddata, input['samplenames'], samplelengths)
+
+    # REPLACE ORIGINAL DATA WITH WARPED DATA IN TEMPLATE DATAFRAME
+    newdataframe = datatoexcel.integratedata(template_df, normeddataframe, input['samplecolumns'][0], input['identifier'][0])
+    dataloc = (input['samplenames'][0] + "_1", input['samplenames'][-1] + "_" + str(samplelengths[-1]))   # headers of first and last data containing columns
+
+    return (dataloc, newdataframe)
+
+def output_norm_results(input, output):
+    """"""
+    # get output filenames and sample number
+    samplenum = len(input['samplenames'])
+    excel_output = input['analysis_name'] + ".xlsx"
+    csv_dataframe = input['analysis_name'] + "_dataframe.csv"
+    align_info = input['analysis_name'] + "_align_info.txt"
+
+    # create output folder, change current directory to output folder
+    cwd = os.getcwd()
+    output_path = cwd + '/' + input['analysis_name'] + "_results"
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+    os.chdir(output_path)
+
+    # CSV OUTPUT OF DATAFRAMES (FOR POST-ANALYSIS)
+    print( "exporting data to csv...")
+    output['newdataframe'].to_csv(csv_dataframe)
+
+    # EXCEL OUTPUT OF DATAFRAMES, GRAPHS OF PROTEINS
+    print( "exporting data to excel...")
+    datatoexcel.exceldump(output['newdataframe'], excel_output, output['samplelengths'], input['samplenames'], output['score_frame'], output['dataloc'])
+
+    # PROVIDE ALIGNMENT INFO TEXT OUTPUT (to stdout and .txt file)
+    out.text_output(input, output, align_info, output_path)
+
+
 # ---------------------- main function ---------------------------#
 def main(input = input):
     """
@@ -280,13 +318,22 @@ def main(input = input):
     output['mod_factors']  = processed_input[3]
     output['original_frame_lengths'] = processed_input[4]
 
-    align_result = complexome_alignment(matched_dataframes[0], output['samplelengths'], modifieddata, input)
-    output['final_alignment'] = align_result[0]
-    output['multiple_alignment_order'] = align_result[1]
-    output['final_align_length'] = align_result[2]
-    output['dataloc'] = align_result[3]
-    output['newdataframe'] = align_result[4]
-    output['pairwisecosts'] = align_result[5]
+    if input['align_check']:
+        align_result = complexome_alignment(matched_dataframes[0], output['samplelengths'], modifieddata, input)
+        output['final_alignment'] = align_result[0]
+        output['multiple_alignment_order'] = align_result[1]
+        output['final_align_length'] = align_result[2]
+        output['dataloc'] = align_result[3]
+        output['newdataframe'] = align_result[4]
+        output['pairwisecosts'] = align_result[5]
+    else:
+        dataloc,newdataframe = insert_normalised_data(matched_dataframes[0], output['samplelengths'],modifieddata,input)
+        output['final_alignment'] = None
+        output['multiple_alignment_order'] = None
+        output['final_align_length'] = None
+        output['dataloc'] = dataloc
+        output['newdataframe'] = newdataframe
+        output['pairwisecosts'] = None
 
     if input['hausdorff_scoring']:
         hausdorff_result = hausdorff_scoring(input, output['final_alignment'], output['final_align_length'],
@@ -296,7 +343,10 @@ def main(input = input):
     else:
         output['score_frame'] = None
 
-    output_results(input, output)
+    if input['align_check']:
+        output_results(input, output)
+    else:
+        output_norm_results(input, output)
 
 if __name__ == "__main__":
 
@@ -318,6 +368,7 @@ if __name__ == "__main__":
     input['norm_check'] = True
     input['normcol'] = None
     input['normfile'] = None
+    input['align_check'] = False
     input['hausdorff_scoring'] = 1
     input['gsea_output'] = 1
     input['GSEA_rank_column'] = 'Gene Symbol'
