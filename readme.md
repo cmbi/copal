@@ -58,7 +58,7 @@ For documentation on how to run an analysis using the GUI, refer to the user gui
 * *dataprep* -- Prepares data for complexome alignment, complementing the provided datasets and normalising data
 * *complement_frames* -- Complements uneven datasets, generating rows for missing proteins
 
-**output modules**
+**output moduless**
 
 * *datatoexcel* -- Produces excel output of COPAL results
 * *txtoutput* -- Produces text output with information on COPAL process. writes to file and to stdout
