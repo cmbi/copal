@@ -128,6 +128,7 @@ def save_output_settings():
     """saves output settings to global variables"""
     global input
     input['analysis_name'] = job_name.get()
+    input['align_check'] = align_check.get()
     input['warp_method'] = warp_method.get()
     normalisation_parameters = get_normalisation(normalisation_type.get(), norm_col.get(), norm_file.get())
     input['norm_check'] = normalisation_parameters[0]
@@ -317,6 +318,12 @@ def check_output():
             messagebox.showwarning("input error",warn_msg)
             return False
 
+    if align_check.get() == False and score_check.get() == True:
+        warn_msg = "cannot perform scoring without aligning samples!"
+        status_var.set(warn_msg)
+        messagebox.showwarning("input error",warn_msg)
+        return False
+
     try:
         hausd_factor.get()
     except:
@@ -341,6 +348,7 @@ def check_output():
                 status_var.set(warn_msg)
                 messagebox.showwarning("input error",warn_msg)
                 return False
+
     if gsea_check.get():
         if gsea_col.get() == '':
             warn_msg = "no GSEA column header entered. required field if GSEA output option is selected"
@@ -402,6 +410,8 @@ def print_output():
     print("norm_check: ", input['norm_check'])
     print("normcol: ", input['normcol'])
     print("normfile: ", input['normfile'])
+    print("align check:", input['align_check'])
+    print("warp method:", input['warp_method'])
     print("score analysis: ", input['hausdorff_scoring'])
     print("hausdorff factor: ", input['hausd_factor'])
     print("gsea output: ", input['gsea_output'])
@@ -668,28 +678,32 @@ def output_options_frame(master):
     choose_folder_button.bind("<Button-1>", get_output_folder)
     choose_folder_button.grid(row = 2, column = 2, sticky = tk.W)
 
-    # choose warping type drop-down
-    warptype_label = tk.Label(master, text = 'warping type:').grid(sticky = tk.E, pady = 5)
-    warptype_dropdown = ttk.OptionMenu(master, warp_method, "interpolate","interpolate","repeat")
-    warptype_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
-
     # data normalisation drop-down
     normalisation_label = tk.Label(master, text = "data normalisation:").grid(sticky = tk.E, pady = 5)
     normalisation_dropdown = ttk.OptionMenu(master, normalisation_type, "None","None", "Using all Proteins", "Using subset from Column", "Using subset from File")
-    normalisation_dropdown.grid(row = 4, column = 1, columnspan = 2, sticky = tk.EW)
+    normalisation_dropdown.grid(row = 3, column = 1, columnspan = 2, sticky = tk.EW)
 
     # norm_col label and entry
     norm_col_label = tk.Label(master, text = "if from column:").grid(sticky = tk.E)
-    norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 5, column = 1,sticky=tk.W)
+    norm_col_entry = ttk.Entry(master, textvariable = norm_col, width = 25).grid(row = 4, column = 1,sticky=tk.W)
 
     # norm_file label and entry
-    norm_file_label = tk.Label(master, text = "if from file:").grid(row = 6, sticky = tk.E)
-    norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 6, column = 1, sticky = tk.W)
+    norm_file_label = tk.Label(master, text = "if from file:").grid(row = 5, sticky = tk.E)
+    norm_file_entry = ttk.Entry(master, textvariable = norm_file, width = 25).grid(row = 5, column = 1, sticky = tk.W)
 
     # choose norm_file button
     norm_file_button = ttk.Button(master, text = "Choose file")
     norm_file_button.bind("<Button-1>", get_norm_file)
-    norm_file_button.grid(row = 6, column = 2, padx = 4, sticky = tk.W)
+    norm_file_button.grid(row = 5, column = 2, padx = 4, sticky = tk.W)
+
+    # alignment check button
+    align_check_button = ttk.Checkbutton(master, text = "perform alignment", variable = align_check)
+    align_check_button.grid(row = 6,sticky = tk.W)        # create checkbutton, set text, assign to boolVar variable
+
+    # choose warping type drop-down
+    warptype_label = tk.Label(master, text = 'warping type:').grid(row = 6,column=1, sticky = tk.E, pady = 5)
+    warptype_dropdown = ttk.OptionMenu(master, warp_method, "interpolate","interpolate","repeat")
+    warptype_dropdown.grid(row = 6, column = 2, columnspan = 2, sticky = tk.EW)
 
     # score analysis check button
     score_analysis_check = ttk.Checkbutton(master, text = "perform score analysis", variable = score_check)
@@ -770,6 +784,7 @@ if __name__ == "__main__":
     ident_col = tk.StringVar()
     sheet_name = tk.StringVar()
     normalisation_type = tk.StringVar()
+    align_check = tk.BooleanVar()
     warp_method = tk.StringVar()
     norm_col = tk.StringVar()
     norm_file = tk.StringVar()
@@ -791,6 +806,7 @@ if __name__ == "__main__":
     # set variable default values
     file_type.set("excel")
     normalisation_type.set("None")
+    align_check.set(True)
     score_check.set(True)
     gsea_check.set(True)
     status_var.set("press save and run to start analysis")

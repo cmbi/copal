@@ -19,6 +19,7 @@ input['samplenames'] = [u'S1_G1', u'S2_G1', u'S3_G1', u'S4_G1', u'S5_G1', u'S1_G
 input['norm_check'] = True
 input['normcol'] = None
 input['normfile'] = None
+input['align_check'] = True
 input['hausdorff_scoring'] = False
 input['gsea_output'] = False
 input['GSEA_rank_column'] = 'Gene Symbol'
