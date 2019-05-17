@@ -24,6 +24,10 @@ def input_checker(dataframes, input):
         input (dict): input dictionary containing all user provided input
     Returns None
     """
+    # check if scoring is checked without alignment
+    if input['align_check'] == False and input['hausdorff_scoring'] == True:
+        raise ValueError("Cannot do hausdorff scoring without alignment!")
+
     for ix,df in enumerate(dataframes):
         datacols = df.columns
         # test if all input samplecolumns match with data
@@ -43,7 +47,6 @@ def input_checker(dataframes, input):
         if input['gsea_output'] and input['GSEA_rank_column']:
             if not input['GSEA_rank_column'] in datacols:
                 raise ValueError("GSEA output column not found: '{}'".format(input['GSEA_rank_column']))
-
 
 # functions
 def multi_dataload(identifier, filename, sheet, skip_rows, file_type):
