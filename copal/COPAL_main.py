@@ -235,7 +235,20 @@ def output_results(input, output):
     out.text_output(input, output, align_info, output_path)
 
 def insert_normalised_data(template_df, samplelengths, modifieddata, input):
-    """alternative function to complexome_alignment if align_check=False"""
+    """
+    alternative function to complexome_alignment if align_check=False
+    
+    instead of aligning samples, inserts normalised data into template dataframe
+        template_df   -- pandas dataframe, contains all data provided in first dataset.
+                         aligned data is inserted into this template dataframe.
+        samplelengths -- list of ints, number of slices for each sample
+        modifieddata  -- normalised iBAQ data, list in list in list structure
+        input         -- dict, containing all provided input for analysis
+    Returns:
+        tuple containing:
+            dataloc -- tuple with 2 strings, name of first and last columns containing data
+            newdataframe -- pandas df, containing aligned data and columns from template
+    """
     #transform normalised data to pandas dataframe
     normeddataframe = datatoexcel.datatoframe(modifieddata, input['samplenames'], samplelengths)
 
@@ -246,7 +259,21 @@ def insert_normalised_data(template_df, samplelengths, modifieddata, input):
     return (dataloc, newdataframe)
 
 def output_norm_results(input, output):
-    """"""
+    """
+    alternative to output_results in case of align_check=False
+    
+    produces output files of results and prints information to stdout
+
+    produces results folder containing
+        - excel file with normalised prpteoms
+        - csv file of normalised profiles
+        - text file with info on normalisation
+    Keyword arguments:
+        input -- dict, containing all provided input for analysis
+        output -- dict, containing results produced during COPAL analysis
+    Returns:
+        None
+    """
     # get output filenames and sample number
     samplenum = len(input['samplenames'])
     excel_output = input['analysis_name'] + ".xlsx"
