@@ -203,6 +203,7 @@ def output_results(input, output):
     csv_score_frame = input['analysis_name'] + "_score_frame.csv"
     csv_dataframe = input['analysis_name'] + "_dataframe.csv"
     align_info = input['analysis_name'] + "_align_info.txt"
+    csv_normdata = input['analysis_name'] + "_normdata.csv"
 
     # create output folder, change current directory to output folder
     cwd = os.getcwd()
@@ -216,10 +217,13 @@ def output_results(input, output):
     if input['hausdorff_scoring']:
         output['score_frame'].to_csv(csv_score_frame)
     output['newdataframe'].to_csv(csv_dataframe)
+    output['normdataframe'].to_csv(csv_normdata)
 
     # EXCEL OUTPUT OF DATAFRAMES, GRAPHS OF PROTEINS
     print( "exporting data to excel...")
-    datatoexcel.exceldump(output['newdataframe'], excel_output, align_lengths, input['samplenames'], output['score_frame'], output['dataloc'])
+    datatoexcel.exceldump(output['newdataframe'],excel_output, 
+                align_lengths, input['samplenames'], output['score_frame'], output['dataloc'],
+                normframe = output['normdataframe'],normloc=output['normdataloc'])
 
     # .RNK OUTPUT FOR GENE SET ENRICHMENT ANALYSIS
     if input['hausdorff_scoring'] and input['gsea_output']:
@@ -353,6 +357,10 @@ def main(input = input):
         output['dataloc'] = align_result[3]
         output['newdataframe'] = align_result[4]
         output['pairwisecosts'] = align_result[5]
+
+        normdataloc, normdataframe = insert_normalised_data(matched_dataframes[0],output['samplelengths'],modifieddata,input)
+        output['normdataloc'] = normdataloc
+        output['normdataframe'] = normdataframe
     else:
         dataloc,newdataframe = insert_normalised_data(matched_dataframes[0], output['samplelengths'],modifieddata,input)
         output['final_alignment'] = None
