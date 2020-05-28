@@ -83,9 +83,9 @@ For documentation on how to run an analysis using the GUI, refer to the user gui
 	
 ## Contact
 
-Prof. Dr. Martijn Huynen
+Joeri van Strien Msc
 
-email: Martijn.Huijnen@radboudumc.nl
+email: Joeri.vanStrien@radboudumc.nl
 
 ## Citing COPAL
 
